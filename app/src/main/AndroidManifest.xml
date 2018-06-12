@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".android.activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -29,8 +29,8 @@
         </activity>
 
         <activity
-            android:name=".activities.ViewActivity"
-            android:parentActivityName=".activities.MainActivity"
+            android:name=".android.activities.ViewActivity"
+            android:parentActivityName=".android.activities.MainActivity"
             android:label="@string/title_activity_viewLog"
             android:exported="false">
             <intent-filter>
@@ -40,8 +40,8 @@
         </activity>
 
         <activity
-            android:name=".activities.ExportActivity"
-            android:parentActivityName=".activities.MainActivity"
+            android:name=".android.activities.ExportActivity"
+            android:parentActivityName=".android.activities.MainActivity"
             android:label="@string/title_activity_exportLog"
             android:exported="false">
             <intent-filter>
@@ -51,8 +51,8 @@
         </activity>
 
         <activity
-            android:name=".activities.SettingsActivity"
-            android:parentActivityName=".activities.MainActivity"
+            android:name=".android.activities.SettingsActivity"
+            android:parentActivityName=".android.activities.MainActivity"
             android:label="@string/title_activity_settings"
             android:exported="false">
             <intent-filter>
@@ -61,20 +61,20 @@
             </intent-filter>
         </activity>
 
-        <provider android:name=".data.SQLiteContentProvider"
-            android:authorities="ca.turbobutterfly.wachadoin.data.SQLiteContentProvider"
+        <provider android:name=".android.data.SQLiteContentProvider"
+            android:authorities="ca.turbobutterfly.wachadoin.android.data.SQLiteContentProvider"
             android:exported="false">
         </provider>
 
-        <receiver android:name=".services.BootReceiver">
+        <receiver android:name=".android.receivers.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".services.AlarmReceiver" />
+        <receiver android:name=".android.receivers.AlarmReceiver" />
 
-        <receiver android:name=".services.SaveReceiver" />
+        <receiver android:name=".android.receivers.SaveReceiver" />
 
     </application>
 </manifest>

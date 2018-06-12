@@ -16,7 +16,7 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null" />
 
-    <ca.turbobutterfly.preferences.DatePreference
+    <ca.turbobutterfly.android.preferences.DatePreference
         android:key="pref_display_reporting_period_start"
         android:title="@string/pref_display_reporting_period_start_title" />
 

@@ -3,22 +3,22 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="ca.turbobutterfly.wachadoin.activities.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="ca.turbobutterfly.wachadoin.android.activities.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_general_header" />
 
     <header
-        android:fragment="ca.turbobutterfly.wachadoin.activities.SettingsActivity$DisplayPreferenceFragment"
+        android:fragment="ca.turbobutterfly.wachadoin.android.activities.SettingsActivity$DisplayPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_display_header" />
 
     <header
-        android:fragment="ca.turbobutterfly.wachadoin.activities.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="ca.turbobutterfly.wachadoin.android.activities.SettingsActivity$NotificationPreferenceFragment"
         android:icon="@drawable/ic_notifications_black_24dp"
         android:title="@string/pref_notifications_header" />
 
     <header
-        android:fragment="ca.turbobutterfly.wachadoin.activities.SettingsActivity$ExportPreferenceFragment"
+        android:fragment="ca.turbobutterfly.wachadoin.android.activities.SettingsActivity$ExportPreferenceFragment"
         android:icon="@drawable/ic_export_black_24dp"
         android:title="@string/pref_export_header" />
 

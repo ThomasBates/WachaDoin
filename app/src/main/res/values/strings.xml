@@ -7,10 +7,16 @@
     <string name="title_activity_exportLog">Export Log</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!-- Main Page ========================================================= -->
     <string name="sample_time">2018–06–20 12:00:00</string>
     <string name="log_prompt">Briefly describe what you have been \n working on for the last %d minute%s.</string>
     <string name="notification_prompt">%d minute%s</string>
     <string name="save_button">\nSave\n</string>
+
+    <!-- DataView Page ========================================================= -->
+    <string name="view_page_prev_button">&lt;</string>
+    <string name="view_page_range">September 31, 2018</string>
+    <string name="view_page_next_button">&gt;</string>
 
     <!-- General Preferences =============================================== -->
     <string name="pref_general_header">General</string>
@@ -91,8 +97,8 @@
     </string-array>
 
     <string-array name="pref_order_list_entries">
-        <item>Ascending (oldest to latest)</item>
-        <item>Descending (latest to oldest)</item>
+        <item>Ascending (oldest to newest)</item>
+        <item>Descending (newest to oldest)</item>
     </string-array>
     <string-array name="pref_order_list_values">
         <item>Ascending</item>
