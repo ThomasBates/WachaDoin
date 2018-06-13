@@ -25,10 +25,6 @@ public class ViewPage extends FragmentView
     private Button _prevButton;
     private Button _nextButton;
     private TextView _rangeTextView;
-
-    private int _dateWidth;
-    private int _timeWidth;
-    private int _textWidth;
     private Grid _grid;
 
     private EventHandler _dataContextPropertyChangedEventHandler = new EventHandler()
@@ -131,18 +127,18 @@ public class ViewPage extends FragmentView
         });
 
         Paint paint = _rangeTextView.getPaint();
-        _dateWidth = 20 + (int)paint.measureText("0000-00-00");
-        _timeWidth = 20 + (int)paint.measureText("00:00");
-        _textWidth = 2000;
+        int dateWidth = 20 + (int) paint.measureText("0000-00-00");
+        int timeWidth = 20 + (int) paint.measureText("00:00");
+        int textWidth = 2000;
 
         _grid = view.findViewById(R.id.grid);
         _grid.SetNoDataText("No data available");
 
-        _grid.AddGridColumn("Date", "DisplayDate", _dateWidth);
-        _grid.AddGridColumn("Start", "DisplayStartTime", _timeWidth);
-        _grid.AddGridColumn("End", "DisplayEndTime", _timeWidth);
-        _grid.AddGridColumn("Total", "DisplayTotalTime", _timeWidth);
-        _grid.AddGridColumn("Activity", "LogText", _textWidth);
+        _grid.AddGridColumn("Date", "DisplayDate", dateWidth);
+        _grid.AddGridColumn("Start", "DisplayStartTime", timeWidth);
+        _grid.AddGridColumn("End", "DisplayEndTime", timeWidth);
+        _grid.AddGridColumn("Total", "DisplayTotalTime", timeWidth);
+        _grid.AddGridColumn("Activity", "LogText", textWidth);
 
         InitializeBindings();
 

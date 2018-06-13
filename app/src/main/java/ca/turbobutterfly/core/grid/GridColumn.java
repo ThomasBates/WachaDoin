@@ -1,4 +1,4 @@
-package ca.turbobutterfly.android.grid;
+package ca.turbobutterfly.core.grid;
 
 public class GridColumn
 {

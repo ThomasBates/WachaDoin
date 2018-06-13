@@ -12,11 +12,13 @@ import ca.turbobutterfly.android.options.OptionsPreferencesProvider;
 import ca.turbobutterfly.core.viewmodels.ViewModel;
 
 import ca.turbobutterfly.wachadoin.R;
+import ca.turbobutterfly.wachadoin.android.logfile.LogFileDeliveryFactory;
 import ca.turbobutterfly.wachadoin.android.receivers.NotificationHelper;
 import ca.turbobutterfly.wachadoin.android.data.ContentProviderDataAccess;
 import ca.turbobutterfly.wachadoin.core.data.DataProvider;
 import ca.turbobutterfly.wachadoin.core.data.IDataAccess;
 import ca.turbobutterfly.wachadoin.core.data.IDataProvider;
+import ca.turbobutterfly.wachadoin.core.logfile.ILogFileDeliveryFactory;
 import ca.turbobutterfly.wachadoin.core.options.IMainOptions;
 import ca.turbobutterfly.wachadoin.core.options.MainOptions;
 import ca.turbobutterfly.wachadoin.core.viewmodels.ExportPageViewModel;
@@ -42,6 +44,11 @@ public class Bootstrapper
         return new DataProvider(dataAccess, mainOptions);
     }
 
+    private static ILogFileDeliveryFactory ComposeLogFileDeliveryFactory(Context context)
+    {
+        return new LogFileDeliveryFactory(context);
+    }
+
     public static ViewModel ComposeMainPageViewModel(Context context)
     {
         IDataProvider dataProvider = ComposeDataProvider(context);
@@ -51,7 +58,7 @@ public class Bootstrapper
                 dataProvider,
                 mainOptions,
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()),
-                context.getString(R.string.log_prompt));
+                context.getString(R.string.main_page_log_prompt));
     }
 
     public static ViewModel ComposeViewPageViewModel(Context context)
@@ -66,8 +73,9 @@ public class Bootstrapper
     {
         IDataProvider dataProvider = ComposeDataProvider(context);
         IMainOptions mainOptions = ComposeMainOptions(context);
+        ILogFileDeliveryFactory factory = ComposeLogFileDeliveryFactory(context);
 
-        return new ExportPageViewModel(dataProvider, mainOptions);
+        return new ExportPageViewModel(dataProvider, mainOptions, factory);
     }
 
     public static NotificationHelper ComposeNotificationHelper(Context context)

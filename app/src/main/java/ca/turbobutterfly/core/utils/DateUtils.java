@@ -138,4 +138,9 @@ public class DateUtils
     {
         return LongTimeSpanFormat().format(date);
     }
+
+    public static boolean equals(Date a, Date b)
+    {
+        return (a == null) ? (b == null) : a.equals(b);
+    }
 }

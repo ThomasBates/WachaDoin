@@ -14,5 +14,5 @@ public interface IDataProvider
 
     boolean SaveLogEntry(Date startTime, Date endTime, String logText);
 
-    IDataTable GetLogEntries(Date rangeStart, Date rangeEnd);
+    IDataTable GetLogEntries(Date rangeStart, Date rangeEnd, int snapTime);
 }

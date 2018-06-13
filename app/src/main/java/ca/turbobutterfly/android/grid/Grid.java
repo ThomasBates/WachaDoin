@@ -7,6 +7,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import ca.turbobutterfly.core.grid.GridColumn;
 import ca.turbobutterfly.core.grid.IGridDataSource;
 
 public class Grid extends LinearLayout

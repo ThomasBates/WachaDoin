@@ -123,6 +123,8 @@ public class GridDataSource implements IGridDataSource
         {
             _groupFields = new String[0];
         }
+
+        InvalidateIndex();
     }
 
     public String[] IndexFields()
@@ -229,25 +231,6 @@ public class GridDataSource implements IGridDataSource
             @Override
             public int compare(IGridDataRow lhs, IGridDataRow rhs)
             {
-//                for (String groupField : _groupFields)
-//                {
-//                    int direction = 1;
-//                    if (groupField.toUpperCase().endsWith(" DESC"))
-//                    {
-//                        direction = -1;
-//                        groupField = groupField.substring(0, groupField.length() - 5);
-//                    }
-//
-//                    String lhsValue = lhs.Value(groupField).toString();
-//                    String rhsValue = rhs.Value(groupField).toString();
-//
-//                    int compare = lhsValue.compareToIgnoreCase(rhsValue);
-//                    if (compare != 0)
-//                    {
-//                        return compare * direction;
-//                    }
-//                }
-
                 for (String indexField : _indexFields)
                 {
                     int direction = 1;
@@ -274,7 +257,10 @@ public class GridDataSource implements IGridDataSource
 
     private void GroupRows()
     {
-        ArrayList<String> groupColumns = new ArrayList<>(Arrays.asList(_groupFields));
+        if (_groupFields.length == 0)
+        {
+            return;
+        }
 
         Object[] groupValues = new Object[_groupFields.length];
 

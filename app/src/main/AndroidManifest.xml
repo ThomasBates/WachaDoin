@@ -4,11 +4,7 @@
     package="ca.turbobutterfly.wachadoin">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!--
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    -->
 
     <application
         android:allowBackup="true"
@@ -64,6 +60,16 @@
         <provider android:name=".android.data.SQLiteContentProvider"
             android:authorities="ca.turbobutterfly.wachadoin.android.data.SQLiteContentProvider"
             android:exported="false">
+        </provider>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="@string/file_provider_authority"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
         </provider>
 
         <receiver android:name=".android.receivers.BootReceiver">

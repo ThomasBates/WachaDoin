@@ -66,8 +66,8 @@ public class ViewPageViewModel extends ViewModel
     private Date _reporting_period_start;
     private Integer _days_per_page;
     private Boolean _group_by_date;
-    private String _order;
-    private Integer _snap;
+    private String _logOrder;
+    private Integer _snapTime;
 
     //  Constants
     private final long _msPerDay = 1000 * 60 * 60 * 24;
@@ -86,8 +86,8 @@ public class ViewPageViewModel extends ViewModel
         _reporting_period_start = _mainOptions.Display().reporting_period_start().Value();
         _days_per_page = _mainOptions.Display().days_per_page().Value();
         _group_by_date = _mainOptions.Display().group_by_date().Value();
-        _order = _mainOptions.Display().order().Value();
-        _snap = _mainOptions.Display().snap().Value();
+        _logOrder = _mainOptions.Display().order().Value();
+        _snapTime = _mainOptions.Display().snap().Value();
 
         SetInitialDataRange();
     }
@@ -146,7 +146,7 @@ public class ViewPageViewModel extends ViewModel
 
     public IDataTable LogEntries()
     {
-        IDataTable logEntries = _dataProvider.GetLogEntries(_rangeStart, _rangeEnd);
+        IDataTable logEntries = _dataProvider.GetLogEntries(_rangeStart, _rangeEnd, _snapTime);
 
         if (logEntries.RowCount() == 0)
         {
@@ -175,7 +175,7 @@ public class ViewPageViewModel extends ViewModel
 
     public String[] IndexFields()
     {
-        if ((_order != null) && (_order.equals("Descending")))
+        if ((_logOrder != null) && (_logOrder.equals("Descending")))
         {
             return new String[]{"EndTime DESC", "StartTime DESC"};
         }

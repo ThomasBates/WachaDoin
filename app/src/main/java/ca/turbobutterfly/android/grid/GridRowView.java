@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ca.turbobutterfly.core.grid.GridColumn;
 import ca.turbobutterfly.core.grid.IGridDataRow;
 import ca.turbobutterfly.core.grid.IGridDataSource;
 

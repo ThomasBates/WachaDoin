@@ -171,7 +171,7 @@ public class NotificationHelper
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder);
         inboxStyle.setBigContentTitle("Wacha Doin?");
         inboxStyle.addLine(_lastLogText);
-        inboxStyle.addLine(_context.getString(R.string.notification_prompt, minutes, plural));
+        inboxStyle.addLine(_context.getString(R.string.main_page_notification_prompt, minutes, plural));
 
         Notification notification = builder.build();
 

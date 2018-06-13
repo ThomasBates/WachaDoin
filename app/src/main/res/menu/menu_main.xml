@@ -22,4 +22,9 @@
         android:orderInCategory="9"
         android:title="@string/title_activity_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="9"
+        android:title="@string/title_activity_about"
+        app:showAsAction="never" />
 </menu>

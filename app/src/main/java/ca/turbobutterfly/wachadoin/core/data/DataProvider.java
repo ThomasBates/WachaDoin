@@ -135,7 +135,7 @@ public class DataProvider implements IDataProvider
     }
 
     @Override
-    public IDataTable GetLogEntries(Date rangeStart, Date rangeEnd)
+    public IDataTable GetLogEntries(Date rangeStart, Date rangeEnd, int snapTime)
     {
         _logEntries = new DataTable();
         _logEntries.AddColumn(new DataColumn("StartTime"));
@@ -154,7 +154,7 @@ public class DataProvider implements IDataProvider
             String endTime = reader.getString("EndTime");
             String logText = reader.getString("LogText");
 
-            AddLogEntryToTable(startTime, endTime, logText);
+            AddLogEntryToTable(startTime, endTime, logText, snapTime);
         }
 
         reader.Close();
@@ -162,17 +162,17 @@ public class DataProvider implements IDataProvider
         return _logEntries;
     }
 
-    private void AddLogEntryToTable(String isoStartTime, String isoEndTime, String logText)
+    private void AddLogEntryToTable(String isoStartTime, String isoEndTime, String logText, int snapTime)
     {
-        int snapTime = _mainOptions.Display().snap().Value() * 60000;
-        int halfTime = snapTime / 2;
+        int snapTime_ms = snapTime * 60000;
+        int halfTime_ms = snapTime_ms / 2;
 
         Date startTime = DateUtils.ISO8601(isoStartTime, new Date(0));
         Date endTime = DateUtils.ISO8601(isoEndTime, new Date());
 
         //  use only the minute portion for calculating time span.
-        long startTime_ms = ((startTime.getTime() + halfTime) / snapTime) * snapTime;
-        long endTime_ms = ((endTime.getTime() + halfTime) / snapTime) * snapTime;
+        long startTime_ms = ((startTime.getTime() + halfTime_ms) / snapTime_ms) * snapTime_ms;
+        long endTime_ms = ((endTime.getTime() + halfTime_ms) / snapTime_ms) * snapTime_ms;
         startTime = new Date(startTime_ms);
         endTime = new Date(endTime_ms);
         Date totalTime = new Date(endTime_ms - startTime_ms);

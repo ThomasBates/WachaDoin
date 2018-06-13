@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ca.turbobutterfly.core.grid.GridColumn;
 import ca.turbobutterfly.core.grid.IGridDataRow;
 import ca.turbobutterfly.core.grid.IGridDataSource;
 
