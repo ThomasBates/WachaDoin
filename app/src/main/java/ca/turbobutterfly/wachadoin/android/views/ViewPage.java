@@ -54,17 +54,17 @@ public class ViewPage extends FragmentView
 
                 case "EditStartTime":
                     _topPosition = _grid.GetTopPosition();
-                    OpenTimePicker(R.string.edit_page_start_time);
+                    OpenTimePicker(R.string.view_page_edit_start_time);
                     break;
 
                 case "EditEndTime":
                     _topPosition = _grid.GetTopPosition();
-                    OpenTimePicker(R.string.edit_page_end_time);
+                    OpenTimePicker(R.string.view_page_edit_end_time);
                     break;
 
                 case "EditLogText":
                     _topPosition = _grid.GetTopPosition();
-                    OpenInputDialog(R.string.edit_page_log_text);
+                    OpenInputDialog(R.string.view_page_edit_log_text);
                     break;
             }
         }
