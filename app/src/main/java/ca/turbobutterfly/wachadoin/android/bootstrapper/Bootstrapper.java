@@ -61,7 +61,8 @@ public class Bootstrapper
                 dataProvider,
                 mainOptions,
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()),
-                context.getString(R.string.main_page_log_prompt));
+                context.getString(R.string.main_page_log_prompt),
+                context.getString(R.string.main_page_log_since));
     }
 
     public static ViewModel ComposeViewPageViewModel(Context context)

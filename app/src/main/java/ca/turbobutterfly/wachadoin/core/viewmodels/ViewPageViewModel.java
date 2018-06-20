@@ -275,14 +275,29 @@ public class ViewPageViewModel extends ViewModel
                 }
                 startTime = newStartTime;
                 break;
+
             case "EndTime":
                 Date newEndTime = (Date)editValue;
+
+                //  If the user selected 00:00, then set it to the
+                //  end of the day, instead of the start of the day.
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(newEndTime);
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
+                if ((hour == 0) && (minute == 0))
+                {
+                    calendar.add(Calendar.DAY_OF_YEAR, 1);
+                    newEndTime = calendar.getTime();
+                }
+
                 if (DateUtils.equals(endTime, newEndTime))
                 {
                     return;
                 }
                 endTime = newEndTime;
                 break;
+
             case "LogText":
                 String newLogText = (String)editValue;
                 if (TextUtils.equals(logText, newLogText))
@@ -327,6 +342,19 @@ public class ViewPageViewModel extends ViewModel
 
             case "EndTime":
                 _insertEndTime = (Date)editValue;
+
+                //  If the user selected 00:00, then set it to the
+                //  end of the day, instead of the start of the day.
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(_insertEndTime);
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
+                if ((hour == 0) && (minute == 0))
+                {
+                    calendar.add(Calendar.DAY_OF_YEAR, 1);
+                    _insertEndTime = calendar.getTime();
+                }
+
                 if (!_insertStartTime.before(_insertEndTime))
                 {
                     return;
@@ -338,21 +366,20 @@ public class ViewPageViewModel extends ViewModel
 
             case "LogText":
                 _insertLogText = (String)editValue;
+
+                boolean updated = _dataProvider.SaveLogEntry(
+                        _insertStartTime,
+                        _insertEndTime,
+                        _insertLogText);
+
+                _dataRow = null;
+                _dataColumn = null;
+
+                if (updated)
+                {
+                    NotifyPropertyChanged("LogEntries");
+                }
                 break;
-        }
-
-        boolean updated = _dataProvider.SaveLogEntry(
-                _insertStartTime,
-                _insertEndTime,
-                _insertLogText);
-//        boolean updated = false;
-
-        _dataRow = null;
-        _dataColumn = null;
-
-        if (updated)
-        {
-            NotifyPropertyChanged("LogEntries");
         }
     }
 
@@ -432,13 +459,21 @@ public class ViewPageViewModel extends ViewModel
                 break;
 
             case "DisplayStartTime":
-                _dataColumn = _dataRow.DataTable().Column("StartTime");
-                NotifyPropertyChanged("EditStartTime");
+                String displayTime = (String)_dataRow.Value(columnName);
+                if (!TextUtils.equals(displayTime, "00:00"))
+                {
+                    _dataColumn = _dataRow.DataTable().Column("StartTime");
+                    NotifyPropertyChanged("EditStartTime");
+                }
                 break;
 
             case "DisplayEndTime":
-                _dataColumn = _dataRow.DataTable().Column("EndTime");
-                NotifyPropertyChanged("EditEndTime");
+                displayTime = (String)_dataRow.Value(columnName);
+                if (!TextUtils.equals(displayTime, "24:00"))
+                {
+                    _dataColumn = _dataRow.DataTable().Column("EndTime");
+                    NotifyPropertyChanged("EditEndTime");
+                }
                 break;
 
             case "LogText":

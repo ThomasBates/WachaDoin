@@ -12,7 +12,8 @@
 
     <!-- Main Page ============================================================================= -->
     <string name="main_page_sample_time">2018–06–20 12:00:00</string>
-    <string name="main_page_log_prompt">Briefly describe what you have been \n working on for the last %d minute%s.</string>
+    <string name="main_page_log_prompt">Briefly describe what you have been\nworking on for the last %d minute%s.</string>
+    <string name="main_page_log_since">\n(Since %s)</string>
     <string name="main_page_notification_prompt">%d minute%s</string>
     <string name="main_page_save_button">\nSave\n</string>
 

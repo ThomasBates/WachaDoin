@@ -69,10 +69,8 @@ public class NotificationHelper
         _doPopupApp = _options.popup_app().Value();
         _ringtone = _options.ringtone().Value();
         _doVibrate = _options.vibrate().Value();
-        String temp = _options.delay().Value();
-        _waitTime = Integer.parseInt(temp) * 60000;
-        temp = _options.snooze().Value();
-        _snoozeTime = Integer.parseInt(temp) * 60000;
+        _waitTime = _options.delay().Value() * 60000;
+        _snoozeTime = _options.snooze().Value() * 60000;
     }
 
     private void CreateNotificationChannel()

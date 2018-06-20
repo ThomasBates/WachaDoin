@@ -11,6 +11,7 @@ import ca.turbobutterfly.core.events.IEventHandler;
 import ca.turbobutterfly.core.mvvm.Command;
 import ca.turbobutterfly.core.mvvm.CommandListener;
 import ca.turbobutterfly.core.mvvm.ICommand;
+import ca.turbobutterfly.core.utils.DateUtils;
 import ca.turbobutterfly.core.utils.ITimer;
 import ca.turbobutterfly.core.mvvm.ViewModel;
 
@@ -23,10 +24,11 @@ public class MainPageViewModel extends ViewModel
     //  Variables ----------------------------------------------------------------------------------
 
     //  Injected dependencies
-    private IDataProvider _dataProvider;
-    private IMainOptions _mainOptions;
-    private SimpleDateFormat _timeFormat;
-    private String _instructionFormat;
+    private final IDataProvider _dataProvider;
+    private final IMainOptions _mainOptions;
+    private final SimpleDateFormat _timeFormat;
+    private final String _instructionFormat;
+    private final String _sinceFormat;
 
     //  Property backers
     private Date _startTime;
@@ -62,22 +64,28 @@ public class MainPageViewModel extends ViewModel
     });
 
     private ITimer _timer;
-    private IEventHandler _timerTickEventHandler = new EventHandler(){
-                @Override
-                public void HandleEvent(Object sender, IEventArgs eventArgs)
-                {
-                    _endTime = new Date();
+    private IEventHandler _timerTickEventHandler = new EventHandler()
+    {
+        @Override
+        public void HandleEvent(Object sender, IEventArgs eventArgs)
+        {
+            _endTime = new Date();
 
-                    String formattedTime = _timeFormat.format(_endTime);
-                    TimeText(formattedTime);
+            String formattedTime = _timeFormat.format(_endTime);
+            TimeText(formattedTime);
 
-                    long milliseconds = _endTime.getTime() - _startTime.getTime();
-                    long minutes = milliseconds / (60 * 1000);
-                    String plural = ((minutes == 1) ? "" : "s");
-                    String formattedInstruction = String.format(_instructionFormat, minutes, plural);
-                    InstructionText(formattedInstruction);
-                }
-            };
+            long milliseconds = _endTime.getTime() - _startTime.getTime();
+            long minutes = milliseconds / (60 * 1000);
+            String plural = ((minutes == 1) ? "" : "s");
+            String formattedInstruction = String.format(_instructionFormat, minutes, plural);
+            if (minutes > _mainOptions.Notification().delay().Value())
+            {
+                formattedInstruction = formattedInstruction
+                        + String.format(_sinceFormat, DateUtils.ShortTime(_startTime));;
+            }
+            InstructionText(formattedInstruction);
+        }
+    };
 
     //  Constructors -------------------------------------------------------------------------------
 
@@ -85,12 +93,14 @@ public class MainPageViewModel extends ViewModel
             IDataProvider dataProvider,
             IMainOptions mainOptions,
             SimpleDateFormat timeFormat,
-            String instructionFormat)
+            String instructionFormat,
+            String sinceFormat)
     {
         _dataProvider = dataProvider;
         _mainOptions = mainOptions;
         _timeFormat = timeFormat;
         _instructionFormat = instructionFormat;
+        _sinceFormat = sinceFormat;
 
         _endTime = new Date();
 
