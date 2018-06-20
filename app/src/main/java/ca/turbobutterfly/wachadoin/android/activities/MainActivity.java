@@ -10,14 +10,13 @@ import android.view.MenuItem;
 import ca.turbobutterfly.core.events.EventHandler;
 import ca.turbobutterfly.core.events.IEventArgs;
 import ca.turbobutterfly.core.mvvm.IPropertyChangedEventArgs;
-import ca.turbobutterfly.core.viewmodels.ViewModel;
+import ca.turbobutterfly.core.mvvm.ViewModel;
 import ca.turbobutterfly.android.views.FragmentView;
 import ca.turbobutterfly.wachadoin.R;
 import ca.turbobutterfly.wachadoin.android.bootstrapper.Bootstrapper;
 
 public class MainActivity extends AppCompatActivity
 {
-
     private EventHandler _dataContextPropertyChangedEventHandler = new EventHandler()
     {
         @Override
@@ -43,13 +42,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        BootstrapView();
-    }
-
-    private void BootstrapView()
-    {
         ViewModel dataContext = Bootstrapper.ComposeMainPageViewModel(this);
-        dataContext.PropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
+        dataContext.OnPropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
 
         FragmentView view = (FragmentView) getSupportFragmentManager().findFragmentById(R.id.main_page);
         view.DataContext(dataContext);
@@ -75,14 +69,14 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_viewLog:
                 ViewLog();
                 break;
-            case R.id.action_editLog:
-                EditLog();
-                break;
             case R.id.action_exportLog:
                 ExportLog();
                 break;
             case R.id.action_settings:
                 ShowSettings();
+                break;
+            case R.id.action_about:
+                ShowAbout();
                 break;
         }
 
@@ -95,12 +89,6 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private void EditLog()
-    {
-        //Intent intent = new Intent(this, EditActivity.class);
-        //startActivity(intent);
-    }
-
     private void ExportLog()
     {
         Intent intent = new Intent(this, ExportActivity.class);
@@ -111,5 +99,10 @@ public class MainActivity extends AppCompatActivity
     {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    private void ShowAbout()
+    {
+
     }
 }

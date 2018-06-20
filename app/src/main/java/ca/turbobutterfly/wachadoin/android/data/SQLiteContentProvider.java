@@ -69,10 +69,6 @@ public class SQLiteContentProvider extends ContentProvider
                 return GetLogDetails(uri, selectionArgs);
             case LOG_SUMMARY:
                 return GetLogSummary(uri);
-            //case SETTING:
-                //return GetSingleSettingRecord(uri);
-            //case SETTINGS:
-                //return GetAllSettingRecords(uri);
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -90,18 +86,15 @@ public class SQLiteContentProvider extends ContentProvider
 //            case LOG:
 //                count = _database.delete(LOG_TABLE_NAME, selection, selectionArgs);
 //                break;
-//            case SETTINGS:
-//                count = _database.delete(SETTINGS_TABLE_NAME, selection, selectionArgs);
-//                break;
 //            default:
 //                throw new IllegalArgumentException("Unsupported URI: " + uri);
 //        }
-
-        Context context = getContext();
-        if (context != null)
-        {
-            context.getContentResolver().notifyChange(uri, null);
-        }
+//
+//        Context context = getContext();
+//        if (context != null)
+//        {
+//            context.getContentResolver().notifyChange(uri, null);
+//        }
         return count;
     }
 
@@ -113,25 +106,13 @@ public class SQLiteContentProvider extends ContentProvider
             @Nullable String[] selectionArgs)
     {
         int count = 0;
-//        switch (uriMatcher.match(uri))
-//        {
-//            case LOG:
-//                count = _database.update(LOG_TABLE_NAME, values, selection, selectionArgs);
-//                break;
-//
-//            case SETTINGS:
-//                count = _database.update(SETTINGS_TABLE_NAME, values, selection, selectionArgs);
-//                break;
-//            default:
-//                throw new IllegalArgumentException("Unsupported URI: " + uri);
-//        }
-
-        Context context = getContext();
-        if (context != null)
+        switch (uriMatcher.match(uri))
         {
-            context.getContentResolver().notifyChange(uri, null);
+            case LOG:
+                return UpdateLogRecord(uri, values);
+            default:
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
-        return count;
     }
 
     @Nullable
@@ -143,10 +124,6 @@ public class SQLiteContentProvider extends ContentProvider
 //            //  Get all log records
 //            case LOG:
 //                return "vnd.android.cursor.dir/vnd.example.students";
-//
-//            //  Get all settings records
-//            case SETTINGS:
-//                return "vnd.android.cursor.item/vnd.example.students";
 //
 //            default:
 //                throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -171,6 +148,23 @@ public class SQLiteContentProvider extends ContentProvider
         }
 
         return null;
+    }
+
+    private int UpdateLogRecord(Uri uri, ContentValues values)
+    {
+        IDataLogEntry logEntry = new ContentValuesLogEntry(values);
+        int count = _dataAccess.UpdateLogEntry(logEntry);
+
+        if (count > 0)
+        {
+            Context context = getContext();
+            if (context != null)
+            {
+                context.getContentResolver().notifyChange(uri, null);
+            }
+        }
+
+        return count;
     }
 
     private Cursor GetLogDetails(Uri uri, String[] selectionArgs)

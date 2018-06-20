@@ -24,7 +24,7 @@ public class LogFileCSVBuilder implements ILogFileBuilder
             Date endTime,
             boolean groupByDate,
             String logOrder,
-            int snapTime)
+            int roundTime)
     {
         GridColumn[] gridColumns = new GridColumn[]
                 {
@@ -35,7 +35,7 @@ public class LogFileCSVBuilder implements ILogFileBuilder
                         new GridColumn("Activity", "LogText", 0)
                 };
 
-        IDataTable logEntries = _dataProvider.GetLogEntries(startTime, endTime, snapTime);
+        IDataTable logEntries = _dataProvider.GetLogEntries(startTime, endTime, groupByDate, roundTime);
 
         GridDataSource dataSource = new GridDataSource(logEntries);
         dataSource.GroupFields(GroupFields(groupByDate));

@@ -1,8 +1,8 @@
 package ca.turbobutterfly.wachadoin.core.viewmodels;
 
-import android.provider.CalendarContract;
-
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import ca.turbobutterfly.core.mvvm.Command;
@@ -10,7 +10,7 @@ import ca.turbobutterfly.core.mvvm.CommandListener;
 import ca.turbobutterfly.core.mvvm.ICommand;
 import ca.turbobutterfly.core.utils.DateUtils;
 import ca.turbobutterfly.core.utils.TextUtils;
-import ca.turbobutterfly.core.viewmodels.ViewModel;
+import ca.turbobutterfly.core.mvvm.ViewModel;
 
 import ca.turbobutterfly.wachadoin.core.data.IDataProvider;
 import ca.turbobutterfly.wachadoin.core.logfile.ILogFileBuilder;
@@ -34,9 +34,14 @@ public class ExportPageViewModel extends ViewModel
     private String _startDateText;
     private Date _endTime;
     private String _endDateText;
+
+    private Boolean _use_reporting_period;
+    private Integer _reporting_period;
+    private Date _reporting_period_start;
+    private Integer _days_per_page;
     private boolean _groupByDate;
     private String _logOrder;
-    private int _snapTime;
+    private int _roundTime;
     private String _fileFormat;
     private String _fileDelivery;
     private String _emailAddress;
@@ -53,8 +58,8 @@ public class ExportPageViewModel extends ViewModel
     });
 
     //  Constants
-    private final long _msPerHour = 1000 * 60 * 60;
-    private final long _msPerDay = _msPerHour * 24;
+//    private final long _msPerHour = 1000 * 60 * 60;
+//    private final long _msPerDay = _msPerHour * 24;
 
     //  Constructors -------------------------------------------------------------------------------
 
@@ -67,9 +72,14 @@ public class ExportPageViewModel extends ViewModel
         _mainOptions = mainOptions;
         _logFileDeliveryFactory = logFileDeliveryFactory;
 
-        _groupByDate = _mainOptions.Export().group_by_date().Value();
-        _logOrder = _mainOptions.Export().order().Value();
-        _snapTime = _mainOptions.Export().snap().Value();
+        _use_reporting_period = _mainOptions.Display().use_reporting_period().Value();
+        _reporting_period = _mainOptions.Display().reporting_period().Value();
+        _reporting_period_start = _mainOptions.Display().reporting_period_start().Value();
+        _days_per_page = _mainOptions.Display().days_per_page().Value();
+        _groupByDate = _mainOptions.Display().group_by_date().Value();
+        _logOrder = _mainOptions.Display().order().Value();
+        _roundTime = _mainOptions.Display().round().Value();
+
         _fileFormat = _mainOptions.Export().format().Value();
         _fileDelivery = _mainOptions.Export().delivery().Value();
         _emailAddress = _mainOptions.Export().email().Value();
@@ -79,37 +89,48 @@ public class ExportPageViewModel extends ViewModel
 
     private void SetInitialDataRange()
     {
-        boolean use_reporting_period = _mainOptions.Display().use_reporting_period().Value();
-        int reporting_period = _mainOptions.Display().reporting_period().Value();
-        Date reporting_period_start = _mainOptions.Display().reporting_period_start().Value();
-        int days_per_page = _mainOptions.Display().days_per_page().Value();
-
-        int offset_ms = TimeZone.getDefault().getOffset(new Date().getTime());
-
-        if (use_reporting_period)
+        if (_use_reporting_period)
         {
-            long now_ms = new Date().getTime() + offset_ms;
-            long rangeStart_ms = ((reporting_period_start.getTime() + offset_ms) / _msPerDay) * _msPerDay - offset_ms;
-            while (rangeStart_ms < now_ms)
+            Date now = new Date();
+            _startTime = _reporting_period_start;
+            while (_startTime.before(now))
             {
-                rangeStart_ms += reporting_period * _msPerDay;
+                _startTime = IncrementDate(_startTime);
             }
-            while (rangeStart_ms > now_ms)
+            while (_startTime.after(now))
             {
-                rangeStart_ms -= reporting_period * _msPerDay;
+                _startTime = DecrementDate(_startTime);
             }
-            rangeStart_ms -= reporting_period * _msPerDay;
-            long rangeEnd_ms = rangeStart_ms + (reporting_period - 1) * _msPerDay;
-            _startTime = new Date(rangeStart_ms);
-            _endTime = new Date(rangeEnd_ms);
+            //  Once more so we're exporting the most
+            //  recently completed reporting period.
+            _startTime = DecrementDate(_startTime);
+            _endTime = IncrementDate(_startTime);
+
+            //  Update reporting_period_start if we're in the next reporting period.
+            //  It makes no difference to program operation, but it will show the new date on the Settings screen.
+            if (!DateUtils.equals(_startTime, _reporting_period_start))
+            {
+                _reporting_period_start = _startTime;
+                _mainOptions.Display().reporting_period_start().Value(_reporting_period_start);
+            }
         }
         else
         {
-            long rangeEnd_ms = ((new Date().getTime() + offset_ms) / _msPerDay + 1) * _msPerDay - offset_ms;
-            long rangeStart_ms = rangeEnd_ms - (days_per_page - 1) * _msPerDay;
-            _endTime = new Date(rangeEnd_ms);
-            _startTime = new Date(rangeStart_ms);
+            //  Get date without time.
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            //  We need the end of today which is the start of tomorrow.
+            calendar = new GregorianCalendar(year, month, day);
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            _endTime = calendar.getTime();
+            _startTime = DecrementDate(_endTime);
         }
+
+        //  Turn _endTime back one day for display purposes.
+        _endTime = DecrementOneDay(_endTime);
 
         _startDateText = DateUtils.LongDate(_startTime);
         _endDateText = DateUtils.LongDate(_endTime);
@@ -125,7 +146,7 @@ public class ExportPageViewModel extends ViewModel
     public void StartTime(Date startTime)
     {
         //  Round to nearest hour.
-        startTime = new Date((startTime.getTime() / _msPerHour) * _msPerHour);
+        //startTime = new Date((startTime.getTime() / _msPerHour) * _msPerHour);
 
         if (DateUtils.equals(startTime, _startTime))
         {
@@ -164,7 +185,7 @@ public class ExportPageViewModel extends ViewModel
     public void EndTime(Date endTime)
     {
         //  Round to nearest hour.
-        endTime = new Date((endTime.getTime() / _msPerHour) * _msPerHour);
+        //endTime = new Date((endTime.getTime() / _msPerHour) * _msPerHour);
 
         if (DateUtils.equals(endTime, _endTime))
         {
@@ -225,19 +246,19 @@ public class ExportPageViewModel extends ViewModel
         NotifyPropertyChanged("LogOrder");
     }
 
-    public Integer SnapTime()
+    public Integer RoundTime()
     {
-        return _snapTime;
+        return _roundTime;
     }
 
-    public void SnapTime(Integer snapTime)
+    public void RoundTime(Integer roundTime)
     {
-        if (snapTime == _snapTime)
+        if (roundTime == _roundTime)
         {
             return;
         }
-        _snapTime = snapTime;
-        NotifyPropertyChanged("SnapTime");
+        _roundTime = roundTime;
+        NotifyPropertyChanged("RoundTime");
     }
 
     public String FileFormat()
@@ -358,9 +379,9 @@ public class ExportPageViewModel extends ViewModel
         }
 
         //  _endTime is the beginning of the last day. we need to send the end of the last day.
-        Date endTime = new Date(_endTime.getTime() + _msPerDay);
+        Date endTime = IncrementOneDay(_endTime);
 
-        return builder.BuildLogFile(_startTime, endTime, _groupByDate, _logOrder, _snapTime);
+        return builder.BuildLogFile(_startTime, endTime, _groupByDate, _logOrder, _roundTime);
     }
 
     private boolean DeliverLogFile(String logFile)
@@ -383,5 +404,77 @@ public class ExportPageViewModel extends ViewModel
         }
 
         return delivery.DeliverLogFile(logFile);
+    }
+
+    private Date IncrementDate(Date date)
+    {
+        int days = _days_per_page;
+        if (_use_reporting_period)
+        {
+            days = _reporting_period;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        switch (days)
+        {
+            case 1:
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                break;
+            case 7:
+                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+                break;
+            case 14:
+                calendar.add(Calendar.WEEK_OF_YEAR, 2);
+                break;
+            case 30:
+                calendar.add(Calendar.MONTH, 1);
+                break;
+        }
+        return calendar.getTime();
+    }
+
+    private Date DecrementDate(Date date)
+    {
+        int days = _days_per_page;
+        if (_use_reporting_period)
+        {
+            days = _reporting_period;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        switch (days)
+        {
+            case 1:
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+                break;
+            case 7:
+                calendar.add(Calendar.WEEK_OF_YEAR, -1);
+                break;
+            case 14:
+                calendar.add(Calendar.WEEK_OF_YEAR, -2);
+                break;
+            case 30:
+                calendar.add(Calendar.MONTH, -1);
+                break;
+        }
+        return calendar.getTime();
+    }
+
+    private Date IncrementOneDay(Date date)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        return calendar.getTime();
+    }
+
+    private Date DecrementOneDay(Date date)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        return calendar.getTime();
     }
 }

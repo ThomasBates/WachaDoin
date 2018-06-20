@@ -12,7 +12,7 @@ import ca.turbobutterfly.core.mvvm.Command;
 import ca.turbobutterfly.core.mvvm.CommandListener;
 import ca.turbobutterfly.core.mvvm.ICommand;
 import ca.turbobutterfly.core.utils.ITimer;
-import ca.turbobutterfly.core.viewmodels.ViewModel;
+import ca.turbobutterfly.core.mvvm.ViewModel;
 
 import ca.turbobutterfly.wachadoin.core.data.IDataProvider;
 

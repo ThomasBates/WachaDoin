@@ -1,5 +1,6 @@
 package ca.turbobutterfly.core.utils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,15 +9,15 @@ import java.util.TimeZone;
 
 public class DateUtils
 {
-    private static SimpleDateFormat _iso8601Format = null;
-    private static SimpleDateFormat _shortDateFormat = null;
-    private static SimpleDateFormat _longDateFormat = null;
-    private static SimpleDateFormat _shortTimeFormat = null;
-    private static SimpleDateFormat _longTimeFormat = null;
-    private static SimpleDateFormat _shortTimeSpanFormat = null;
-    private static SimpleDateFormat _longTimeSpanFormat = null;
+    private static DateFormat _iso8601Format = null;
+    private static DateFormat _shortDateFormat = null;
+    private static DateFormat _longDateFormat = null;
+    private static DateFormat _shortTimeFormat = null;
+    private static DateFormat _longTimeFormat = null;
+    private static DateFormat _shortTimeSpanFormat = null;
+    private static DateFormat _longTimeSpanFormat = null;
 
-    public static SimpleDateFormat ISO8601Format()
+    public static DateFormat ISO8601Format()
     {
         if (_iso8601Format == null)
         {
@@ -25,7 +26,7 @@ public class DateUtils
         return _iso8601Format;
     }
 
-    public static SimpleDateFormat ShortDateFormat()
+    public static DateFormat ShortDateFormat()
     {
         if (_shortDateFormat == null)
         {
@@ -34,11 +35,11 @@ public class DateUtils
         return _shortDateFormat;
     }
 
-    public static SimpleDateFormat LongDateFormat()
+    public static DateFormat LongDateFormat()
     {
         if (_longDateFormat == null)
         {
-            _longDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
+            _longDateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.FULL);
 
 //            final String format = Settings.System.getString(getContentResolver(), Settings.System.DATE_FORMAT);
 //
@@ -54,7 +55,7 @@ public class DateUtils
         return _longDateFormat;
     }
 
-    public static SimpleDateFormat ShortTimeFormat()
+    public static DateFormat ShortTimeFormat()
     {
         if (_shortTimeFormat == null)
         {
@@ -63,7 +64,7 @@ public class DateUtils
         return _shortTimeFormat;
     }
 
-    public static SimpleDateFormat LongTimeFormat()
+    public static DateFormat LongTimeFormat()
     {
         if (_longTimeFormat == null)
         {
@@ -72,7 +73,7 @@ public class DateUtils
         return _longTimeFormat;
     }
 
-    public static SimpleDateFormat ShortTimeSpanFormat()
+    public static DateFormat ShortTimeSpanFormat()
     {
         if (_shortTimeSpanFormat == null)
         {
@@ -82,7 +83,7 @@ public class DateUtils
         return _shortTimeSpanFormat;
     }
 
-    public static SimpleDateFormat LongTimeSpanFormat()
+    public static DateFormat LongTimeSpanFormat()
     {
         if (_longTimeSpanFormat == null)
         {
@@ -99,6 +100,10 @@ public class DateUtils
 
     public static Date ISO8601(String iso8601Date, Date defaultValue)
     {
+        if (iso8601Date == null)
+        {
+            return defaultValue;
+        }
         try
         {
             return ISO8601Format().parse(iso8601Date);
@@ -112,6 +117,22 @@ public class DateUtils
     public static String ShortDate(Date date)
     {
         return ShortDateFormat().format(date);
+    }
+
+    public static Date ShortDate(String value, Date defaultDate)
+    {
+        if (value == null)
+        {
+            return defaultDate;
+        }
+        try
+        {
+            return ShortDateFormat().parse(value);
+        }
+        catch (ParseException ex)
+        {
+            return defaultDate;
+        }
     }
 
     public static String LongDate(Date date)

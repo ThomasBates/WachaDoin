@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import ca.turbobutterfly.core.data.IDataColumn;
 import ca.turbobutterfly.core.data.IDataRow;
 import ca.turbobutterfly.core.data.IDataTable;
+import ca.turbobutterfly.core.utils.DateUtils;
 
 public class GridDataSource implements IGridDataSource
 {
@@ -39,6 +41,7 @@ public class GridDataSource implements IGridDataSource
         {
             IGridDataColumn gridDataColumn = new GridDataColumn(column);
             _columns.add(gridDataColumn);
+            _columnsByName.put(gridDataColumn.Name(), gridDataColumn);
         }
     }
 
@@ -240,10 +243,15 @@ public class GridDataSource implements IGridDataSource
                         indexField = indexField.substring(0, indexField.length() - 5);
                     }
 
-                    String lhsValue = lhs.Value(indexField).toString();
-                    String rhsValue = rhs.Value(indexField).toString();
+                    Object lhsValue = lhs.Value(indexField);
+                    Object rhsValue = rhs.Value(indexField);
 
-                    int compare = lhsValue.compareToIgnoreCase(rhsValue);
+                    int compare = 0;
+                    if (lhsValue instanceof Comparable)
+                    {
+                        compare = ((Comparable)lhsValue).compareTo(rhsValue);
+                    }
+
                     if (compare != 0)
                     {
                         return compare * direction;

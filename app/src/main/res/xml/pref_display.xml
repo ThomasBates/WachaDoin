@@ -50,8 +50,8 @@
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
-        android:key="pref_display_snap"
-        android:title="@string/pref_display_snap_title"
+        android:key="pref_display_round"
+        android:title="@string/pref_display_round_title"
         android:entries="@array/pref_time_span_list_entries"
         android:entryValues="@array/pref_time_span_list_values"
         android:defaultValue="1"

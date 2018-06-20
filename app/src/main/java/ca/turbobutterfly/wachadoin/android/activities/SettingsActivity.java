@@ -23,9 +23,12 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import java.util.Date;
 import java.util.List;
 
 import ca.turbobutterfly.android.activities.AppCompatPreferenceActivity;
+import ca.turbobutterfly.android.preferences.DatePreference;
+import ca.turbobutterfly.core.utils.DateUtils;
 import ca.turbobutterfly.wachadoin.R;
 
 /**
@@ -168,22 +171,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                         return true;
                     }
 
-                    Preference pref_display_reporting_period = _displayFragment.findPreference("pref_display_reporting_period");
-                    Preference pref_display_days_per_page = _displayFragment.findPreference("pref_display_days_per_page");
+                    Preference reporting_period = _displayFragment.findPreference("pref_display_reporting_period");
+                    Preference reporting_period_start = _displayFragment.findPreference("pref_display_reporting_period_start");
+                    Preference days_per_page = _displayFragment.findPreference("pref_display_days_per_page");
 
-                    if ((pref_display_reporting_period == null) ||
-                        (pref_display_days_per_page == null))
+                    if ((reporting_period == null) ||
+                        (reporting_period_start == null) ||
+                        (days_per_page == null))
                     {
                         return true;
                     }
 
                     boolean useReportingPeriod = (boolean) newValue;
 
-                    pref_display_reporting_period.setEnabled(useReportingPeriod);
-                    pref_display_days_per_page.setEnabled(!useReportingPeriod);
+                    reporting_period.setEnabled(useReportingPeriod);
+                    reporting_period_start.setEnabled(useReportingPeriod);
+                    days_per_page.setEnabled(!useReportingPeriod);
 
                     return true;
                 }
+            }
+
+            if (preference instanceof DatePreference)
+            {
+                DatePreference datePreference = (DatePreference)preference;
+                Date dateValue = datePreference.getDate();
+                String summary = DateUtils.LongDate(dateValue);
+                preference.setSummary(summary);
+
+                return true;
             }
 
             // For all other preferences, set the summary to the value's
@@ -447,7 +463,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             SetupPreferenceSummary(this, "pref_display_reporting_period_start");
             SetupPreferenceSummary(this, "pref_display_days_per_page");
             SetupPreferenceSummary(this, "pref_display_order");
-            SetupPreferenceSummary(this, "pref_display_snap");
+            SetupPreferenceSummary(this, "pref_display_round");
         }
 
         @Override
@@ -516,13 +532,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             addPreferencesFromResource(R.xml.pref_export);
             setHasOptionsMenu(true);
 
-            //boolean preOreo = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O;
-
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences to their values.
             // When their values change, their summaries are updated to reflect the new value,
             // per the Android Design guidelines.
-            SetupPreferenceSummary(this, "pref_export_order");
-            SetupPreferenceSummary(this, "pref_export_snap");
             SetupPreferenceSummary(this, "pref_export_format");
             SetupPreferenceSummary(this, "pref_export_delivery");
             SetupPreferenceSummary(this, "pref_export_email");

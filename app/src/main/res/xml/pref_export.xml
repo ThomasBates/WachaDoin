@@ -1,32 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
-        android:key="pref_export_group_by_date"
-        android:title="@string/pref_export_group_by_date_title"
-        android:defaultValue="true" />
-
-    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to dismiss it. -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-    <ListPreference
-        android:key="pref_export_order"
-        android:title="@string/pref_export_order_title"
-        android:entries="@array/pref_order_list_entries"
-        android:entryValues="@array/pref_order_list_values"
-        android:defaultValue="Ascending"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null" />
-
-    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to dismiss it. -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-    <ListPreference
-        android:key="pref_export_snap"
-        android:title="@string/pref_export_snap_title"
-        android:entries="@array/pref_time_span_list_entries"
-        android:entryValues="@array/pref_time_span_list_values"
-        android:defaultValue="1"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null" />
-
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference

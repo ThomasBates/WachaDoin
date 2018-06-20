@@ -14,23 +14,32 @@ import java.util.List;
 import ca.turbobutterfly.core.grid.GridColumn;
 import ca.turbobutterfly.core.grid.IGridDataRow;
 import ca.turbobutterfly.core.grid.IGridDataSource;
+import ca.turbobutterfly.wachadoin.R;
 
 public class GridRowView extends LinearLayout
 {
-    Context _context;
-    public List<GridColumn> _gridColumns;
+    private final Context _context;
+    private final List<GridColumn> _gridColumns;
+    private final IGridDataRow _row;
+    private final OnLongClickListener _onLongClickListener;
+    private final OnClickListener _onClickListener;
 
     TextView[] _textViews;
 
     public GridRowView(
             Context context,
             ArrayList<GridColumn> gridColumns,
-            IGridDataRow row)
+            IGridDataRow row,
+            OnLongClickListener onLongClickListener,
+            OnClickListener onClickListener)
     {
         super(context);
 
         _context = context;
         _gridColumns = gridColumns;
+        _row = row;
+        _onLongClickListener = onLongClickListener;
+        _onClickListener = onClickListener;
 
         setOrientation(HORIZONTAL);
 
@@ -49,6 +58,9 @@ public class GridRowView extends LinearLayout
             textView.setTextColor(Color.BLACK);
             textView.setSingleLine(true);
             textView.setGravity(Gravity.CENTER_VERTICAL);
+            textView.setTag(R.string.grid_row_tag, _row);
+            textView.setOnLongClickListener(_onLongClickListener);
+            textView.setOnClickListener(_onClickListener);
 
             addView(textView, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -67,7 +79,7 @@ public class GridRowView extends LinearLayout
                     continue;
                 }
 
-                TextView textView = new TextView(_context);
+                final TextView textView = new TextView(_context);
                 _textViews[i] = textView;
 
                 textView.setPadding(5, 0, 5, 0);
@@ -75,6 +87,10 @@ public class GridRowView extends LinearLayout
                 textView.setTextColor(Color.BLACK);
                 textView.setSingleLine(true);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
+                textView.setTag(R.string.grid_row_tag, _row);
+                textView.setTag(R.string.grid_column_name_tag, gridColumn.FieldName());
+                textView.setOnLongClickListener(_onLongClickListener);
+                textView.setOnClickListener(_onClickListener);
 
                 addView(textView, new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -89,7 +105,13 @@ public class GridRowView extends LinearLayout
         Populate(row);
     }
 
-    public void Populate(IGridDataRow row)
+    IGridDataRow Row()
+    {
+        return _row;
+    }
+
+
+    private void Populate(IGridDataRow row)
     {
         IGridDataSource dataSource = row.DataSource();
         ArrayList<String> groupFields = new ArrayList<>(Arrays.asList(dataSource.GroupFields()));

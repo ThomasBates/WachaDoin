@@ -4,5 +4,5 @@ import java.util.Date;
 
 public interface ILogFileBuilder
 {
-    String BuildLogFile(Date startTime, Date endTime, boolean groupByDate, String logOrder, int snapTime);
+    String BuildLogFile(Date startTime, Date endTime, boolean groupByDate, String logOrder, int roundTime);
 }

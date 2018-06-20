@@ -5,6 +5,7 @@ class DataLogEntry implements IDataLogEntry
     private String _startTime;
     private String _endTime;
     private String _logText;
+    private String _fieldName;
 
     @Override
     public String StartTime()
@@ -40,5 +41,17 @@ class DataLogEntry implements IDataLogEntry
     public void LogText(String logText)
     {
         _logText = logText;
+    }
+
+    @Override
+    public String FieldName()
+    {
+        return _fieldName;
+    }
+
+    @Override
+    public void FieldName(String fieldName)
+    {
+        _fieldName = fieldName;
     }
 }

@@ -1,15 +1,21 @@
 package ca.turbobutterfly.wachadoin.core.viewmodels;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import ca.turbobutterfly.core.data.IDataColumn;
+import ca.turbobutterfly.core.data.IDataRow;
 import ca.turbobutterfly.core.data.IDataTable;
+import ca.turbobutterfly.core.grid.IGridDataColumn;
+import ca.turbobutterfly.core.grid.IGridDataRowEventArgs;
 import ca.turbobutterfly.core.mvvm.Command;
 import ca.turbobutterfly.core.mvvm.CommandListener;
 import ca.turbobutterfly.core.mvvm.ICommand;
 import ca.turbobutterfly.core.utils.DateUtils;
 import ca.turbobutterfly.core.utils.TextUtils;
-import ca.turbobutterfly.core.viewmodels.ViewModel;
+import ca.turbobutterfly.core.mvvm.ViewModel;
 
 import ca.turbobutterfly.wachadoin.core.data.IDataProvider;
 import ca.turbobutterfly.wachadoin.core.options.IMainOptions;
@@ -24,6 +30,7 @@ public class ViewPageViewModel extends ViewModel
 
     //  Property backers
     private String _dateRangeText;
+    private IDataTable _logEntries;
 
     private ICommand _prevCommand = new Command(new CommandListener()
     {
@@ -55,6 +62,15 @@ public class ViewPageViewModel extends ViewModel
         }
     });
 
+    private ICommand _editCellCommand = new Command(new CommandListener()
+    {
+        @Override
+        public void Execute(Object parameter)
+        {
+            DoEditCell(parameter);
+        }
+    });
+
     //  Internal
     private Date _rangeStart;
     private Date _rangeEnd;
@@ -67,10 +83,18 @@ public class ViewPageViewModel extends ViewModel
     private Integer _days_per_page;
     private Boolean _group_by_date;
     private String _logOrder;
-    private Integer _snapTime;
+    private Integer _roundTime;
+
+    private IDataRow _dataRow;
+    private IDataColumn _dataColumn;
+
+    private boolean _insertingRow;
+    private Date _insertStartTime;
+    private Date _insertEndTime;
+    private String _insertLogText;
 
     //  Constants
-    private final long _msPerDay = 1000 * 60 * 60 * 24;
+//    private final long _msPerDay = 1000 * 60 * 60 * 24;
 
     //  Constructors -------------------------------------------------------------------------------
 
@@ -87,38 +111,48 @@ public class ViewPageViewModel extends ViewModel
         _days_per_page = _mainOptions.Display().days_per_page().Value();
         _group_by_date = _mainOptions.Display().group_by_date().Value();
         _logOrder = _mainOptions.Display().order().Value();
-        _snapTime = _mainOptions.Display().snap().Value();
+        _roundTime = _mainOptions.Display().round().Value();
 
         SetInitialDataRange();
     }
 
     private void SetInitialDataRange()
     {
-        int offset_ms = TimeZone.getDefault().getOffset(new Date().getTime());
-
         if (_use_reporting_period)
         {
-            //long startDay_ms = (startTime.getTime() + offset_ms) / _msPerDay;
-            long now_ms = new Date().getTime() + offset_ms;
-            long rangeStart_ms = ((_reporting_period_start.getTime() + offset_ms) / _msPerDay) * _msPerDay - offset_ms;
-            while (rangeStart_ms < now_ms)
+            Date now = new Date();
+            _rangeStart = _reporting_period_start;
+            while (_rangeStart.before(now))
             {
-                rangeStart_ms += _reporting_period * _msPerDay;
+                _rangeStart = IncrementDate(_rangeStart);
             }
-            while (rangeStart_ms > now_ms)
+            while (_rangeStart.after(now))
             {
-                rangeStart_ms -= _reporting_period * _msPerDay;
+                _rangeStart = DecrementDate(_rangeStart);
             }
-            long rangeEnd_ms = rangeStart_ms + _reporting_period * _msPerDay;
-            _rangeStart = new Date(rangeStart_ms);
-            _rangeEnd = new Date(rangeEnd_ms);
+            _rangeEnd = IncrementDate(_rangeStart);
+
+            //  Update reporting_period_start if we're in the next reporting period.
+            //  It makes no difference to program operation, but it will show the new date on the Settings screen.
+            if (!DateUtils.equals(_rangeStart, _reporting_period_start))
+            {
+                _reporting_period_start = _rangeStart;
+                _mainOptions.Display().reporting_period_start().Value(_reporting_period_start);
+            }
         }
         else
         {
-            long rangeEnd_ms = ((new Date().getTime() + offset_ms) / _msPerDay + 1) * _msPerDay - offset_ms;
-            long rangeStart_ms = rangeEnd_ms - _days_per_page * _msPerDay;
-            _rangeEnd = new Date(rangeEnd_ms);
-            _rangeStart = new Date(rangeStart_ms);
+            //  Get date without time.
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            //  We need the end of today which is the start of tomorrow.
+            calendar = new GregorianCalendar(year, month, day);
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            _rangeEnd = calendar.getTime();
+            _rangeStart = DecrementDate(_rangeEnd);
         }
 
         _minRangeStart = new Date(0);
@@ -146,9 +180,13 @@ public class ViewPageViewModel extends ViewModel
 
     public IDataTable LogEntries()
     {
-        IDataTable logEntries = _dataProvider.GetLogEntries(_rangeStart, _rangeEnd, _snapTime);
+        _logEntries = _dataProvider.GetLogEntries(
+                _rangeStart,
+                _rangeEnd,
+                _group_by_date,
+                _roundTime);
 
-        if (logEntries.RowCount() == 0)
+        if (_logEntries.RowCount() == 0)
         {
             if (_rangeEnd.equals(_maxRangeEnd))
             {
@@ -160,7 +198,7 @@ public class ViewPageViewModel extends ViewModel
             }
         }
 
-        return logEntries;
+        return _logEntries;
     }
 
     public String[] GroupFields()
@@ -175,12 +213,147 @@ public class ViewPageViewModel extends ViewModel
 
     public String[] IndexFields()
     {
-        if ((_logOrder != null) && (_logOrder.equals("Descending")))
+        if (TextUtils.equals(_logOrder,"Descending"))
         {
             return new String[]{"EndTime DESC", "StartTime DESC"};
         }
 
         return new String[]{"EndTime", "StartTime"};
+    }
+
+    public int DefaultTopPosition()
+    {
+        if (TextUtils.equals(_logOrder,"Descending"))
+        {
+            return 0;
+        }
+
+        return _logEntries.RowCount();
+    }
+
+    public Object EditValue()
+    {
+        if ((_dataRow == null) || (_dataColumn == null))
+        {
+            return null;
+        }
+
+        return _dataRow.Value(_dataColumn);
+    }
+
+    public void EditValue(Object editValue)
+    {
+        if (_insertingRow)
+        {
+            InsertValue(editValue);
+            return;
+        }
+
+        if ((_dataRow == null) || (_dataColumn == null))
+        {
+            return;
+        }
+
+        Object oldValue = EditValue();
+
+        if ((oldValue == null) ? (editValue == null) : oldValue.equals(editValue))
+        {
+            return;
+        }
+
+        Date startTime = (Date)_dataRow.Value("StartTime");
+        Date endTime = (Date)_dataRow.Value("EndTime");
+        String logText = (String)_dataRow.Value("LogText");
+
+        switch (_dataColumn.Name())
+        {
+            case "StartTime":
+                Date newStartTime = (Date)editValue;
+                if (DateUtils.equals(startTime, newStartTime))
+                {
+                    return;
+                }
+                startTime = newStartTime;
+                break;
+            case "EndTime":
+                Date newEndTime = (Date)editValue;
+                if (DateUtils.equals(endTime, newEndTime))
+                {
+                    return;
+                }
+                endTime = newEndTime;
+                break;
+            case "LogText":
+                String newLogText = (String)editValue;
+                if (TextUtils.equals(logText, newLogText))
+                {
+                    return;
+                }
+                logText = newLogText;
+                break;
+        }
+
+        if (!startTime.before(endTime))
+        {
+            return;
+        }
+
+        boolean updated = _dataProvider.UpdateLogEntry(startTime, endTime, logText, _dataColumn.Name());
+
+        _dataRow = null;
+        _dataColumn = null;
+
+        if (updated)
+        {
+            NotifyPropertyChanged("LogEntries");
+        }
+    }
+
+    private void InsertValue(Object editValue)
+    {
+        if ((_dataRow == null) || (_dataColumn == null))
+        {
+            return;
+        }
+
+        switch (_dataColumn.Name())
+        {
+            case "StartTime":
+                _insertStartTime = (Date)editValue;
+
+                _dataColumn = _dataRow.DataTable().Column("EndTime");
+                NotifyPropertyChanged("EditEndTime");
+                return;
+
+            case "EndTime":
+                _insertEndTime = (Date)editValue;
+                if (!_insertStartTime.before(_insertEndTime))
+                {
+                    return;
+                }
+
+                _dataColumn = _dataRow.DataTable().Column("LogText");
+                NotifyPropertyChanged("EditLogText");
+                return;
+
+            case "LogText":
+                _insertLogText = (String)editValue;
+                break;
+        }
+
+        boolean updated = _dataProvider.SaveLogEntry(
+                _insertStartTime,
+                _insertEndTime,
+                _insertLogText);
+//        boolean updated = false;
+
+        _dataRow = null;
+        _dataColumn = null;
+
+        if (updated)
+        {
+            NotifyPropertyChanged("LogEntries");
+        }
     }
 
     public ICommand PrevCommand()
@@ -191,6 +364,11 @@ public class ViewPageViewModel extends ViewModel
     public ICommand NextCommand()
     {
         return _nextCommand;
+    }
+
+    public ICommand EditCellCommand()
+    {
+        return _editCellCommand;
     }
 
     //  Methods ------------------------------------------------------------------------------------
@@ -208,17 +386,8 @@ public class ViewPageViewModel extends ViewModel
 
     private void DoPrev()
     {
-        int daysPerPage = _days_per_page;
-
-        if (_use_reporting_period)
-        {
-            daysPerPage = _reporting_period;
-        }
-
         _rangeEnd = _rangeStart;
-        long rangeEnd_ms = _rangeEnd.getTime();
-        long rangeStart_ms = rangeEnd_ms - daysPerPage * _msPerDay;
-        _rangeStart = new Date(rangeStart_ms);
+        _rangeStart = DecrementDate(_rangeEnd);
 
         DateRangeText(DateUtils.LongDate(_rangeStart));
     }
@@ -230,18 +399,108 @@ public class ViewPageViewModel extends ViewModel
 
     private void DoNext()
     {
-        int daysPerPage = _days_per_page;
-
-        if (_use_reporting_period)
-        {
-            daysPerPage = _reporting_period;
-        }
-
         _rangeStart = _rangeEnd;
-        long rangeStart_ms = _rangeStart.getTime();
-        long rangeEnd_ms = rangeStart_ms + daysPerPage * _msPerDay;
-        _rangeEnd = new Date(rangeEnd_ms);
+        _rangeEnd = IncrementDate(_rangeStart);
 
         DateRangeText(DateUtils.LongDate(_rangeStart));
+    }
+
+    private void DoEditCell(Object parameter)
+    {
+        IGridDataRowEventArgs eventArgs = (IGridDataRowEventArgs)parameter;
+
+        _dataRow = eventArgs.Row().DataRow();
+        IGridDataColumn column = eventArgs.Column();
+        String columnName;
+        if (column != null)
+        {
+            columnName = column.Name();
+        }
+        else
+        {
+            columnName = "DisplayDate";
+        }
+
+        _insertingRow = false;
+
+        switch (columnName)
+        {
+            case "DisplayDate":
+                _insertingRow = true;
+                _dataColumn = _dataRow.DataTable().Column("StartTime");
+                NotifyPropertyChanged("EditStartTime");
+                break;
+
+            case "DisplayStartTime":
+                _dataColumn = _dataRow.DataTable().Column("StartTime");
+                NotifyPropertyChanged("EditStartTime");
+                break;
+
+            case "DisplayEndTime":
+                _dataColumn = _dataRow.DataTable().Column("EndTime");
+                NotifyPropertyChanged("EditEndTime");
+                break;
+
+            case "LogText":
+                _dataColumn = _dataRow.DataTable().Column("LogText");
+                NotifyPropertyChanged("EditLogText");
+                break;
+        }
+    }
+
+    private Date IncrementDate(Date date)
+    {
+        int days = _days_per_page;
+        if (_use_reporting_period)
+        {
+            days = _reporting_period;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        switch (days)
+        {
+            case 1:
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                break;
+            case 7:
+                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+                break;
+            case 14:
+                calendar.add(Calendar.WEEK_OF_YEAR, 2);
+                break;
+            case 30:
+                calendar.add(Calendar.MONTH, 1);
+                break;
+        }
+        return calendar.getTime();
+    }
+
+    private Date DecrementDate(Date date)
+    {
+        int days = _days_per_page;
+        if (_use_reporting_period)
+        {
+            days = _reporting_period;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        switch (days)
+        {
+            case 1:
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+                break;
+            case 7:
+                calendar.add(Calendar.WEEK_OF_YEAR, -1);
+                break;
+            case 14:
+                calendar.add(Calendar.WEEK_OF_YEAR, -2);
+                break;
+            case 30:
+                calendar.add(Calendar.MONTH, -1);
+                break;
+        }
+        return calendar.getTime();
     }
 }

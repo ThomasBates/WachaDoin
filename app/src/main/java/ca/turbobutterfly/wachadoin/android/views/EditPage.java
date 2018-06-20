@@ -1,5 +1,6 @@
 package ca.turbobutterfly.wachadoin.android.views;
 
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,28 +11,29 @@ import android.widget.TextView;
 
 import java.util.Date;
 
+import ca.turbobutterfly.android.grid.Grid;
 import ca.turbobutterfly.android.utils.ReturnValueDelegate;
 import ca.turbobutterfly.android.utils.ViewUtils;
+import ca.turbobutterfly.android.views.FragmentView;
+
 import ca.turbobutterfly.core.events.EventHandler;
 import ca.turbobutterfly.core.events.IEventArgs;
-import ca.turbobutterfly.android.grid.Grid;
 import ca.turbobutterfly.core.events.IEventHandler;
 import ca.turbobutterfly.core.grid.GridDataSource;
 import ca.turbobutterfly.core.mvvm.IPropertyChangedEventArgs;
-import ca.turbobutterfly.android.views.FragmentView;
+import ca.turbobutterfly.core.utils.DateUtils;
 
 import ca.turbobutterfly.wachadoin.R;
-import ca.turbobutterfly.wachadoin.core.viewmodels.ViewPageViewModel;
+import ca.turbobutterfly.wachadoin.core.viewmodels.EditPageViewModel;
 
-public class ViewPage extends FragmentView
+public class EditPage extends FragmentView
 {
-    private ViewPageViewModel _dataContext;
+    private EditPageViewModel _dataContext;
 
     private Button _prevButton;
     private Button _nextButton;
-    private TextView _rangeTextView;
+    private TextView _dateTextView;
     private Grid _grid;
-    private int _topPosition = -1;
 
     private EventHandler _dataContextPropertyChangedEventHandler = new EventHandler()
     {
@@ -42,9 +44,8 @@ public class ViewPage extends FragmentView
 
             switch (propertyName)
             {
-                case "DateRangeText":
-                    _topPosition = -1;
-                    _rangeTextView.setText(_dataContext.DateRangeText());
+                case "DateText":
+                    _dateTextView.setText(_dataContext.DateText());
                     RequeryLogEntries();
                     break;
 
@@ -53,17 +54,14 @@ public class ViewPage extends FragmentView
                     break;
 
                 case "EditStartTime":
-                    _topPosition = _grid.GetTopPosition();
                     OpenTimePicker(R.string.edit_page_start_time);
                     break;
 
                 case "EditEndTime":
-                    _topPosition = _grid.GetTopPosition();
                     OpenTimePicker(R.string.edit_page_end_time);
                     break;
 
                 case "EditLogText":
-                    _topPosition = _grid.GetTopPosition();
                     OpenInputDialog(R.string.edit_page_log_text);
                     break;
             }
@@ -73,7 +71,7 @@ public class ViewPage extends FragmentView
     @Override
     public String toString()
     {
-        return "View Log";
+        return "Edit Log";
     }
 
     @Override
@@ -84,7 +82,7 @@ public class ViewPage extends FragmentView
             _dataContext.OnPropertyChanged().Unsubscribe(_dataContextPropertyChangedEventHandler);
         }
 
-        _dataContext = (ViewPageViewModel) dataContext;
+        _dataContext = (EditPageViewModel) dataContext;
 
         if (_dataContext != null)
         {
@@ -100,12 +98,12 @@ public class ViewPage extends FragmentView
         {
             return;
         }
-        if (_rangeTextView == null)
+        if (_dateTextView == null)
         {
             return;
         }
 
-        _rangeTextView.setText(_dataContext.DateRangeText());
+        _dateTextView.setText(_dataContext.DateText());
 
         RequeryLogEntries();
     }
@@ -116,9 +114,9 @@ public class ViewPage extends FragmentView
             ViewGroup container,
             Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.view_page, container, false);
+        View view = inflater.inflate(R.layout.edit_page, container, false);
 
-        _rangeTextView = view.findViewById(R.id.rangeTextView);
+        _dateTextView = view.findViewById(R.id.dateTextView);
 
         _prevButton = view.findViewById(R.id.prevButton);
         _prevButton.setOnClickListener(new View.OnClickListener()
@@ -146,7 +144,7 @@ public class ViewPage extends FragmentView
             }
         });
 
-        Paint paint = _rangeTextView.getPaint();
+        Paint paint = _dateTextView.getPaint();
         int dateWidth = 20 + (int) paint.measureText("0000-00-00");
         int timeWidth = 20 + (int) paint.measureText("00:00");
         int textWidth = 2000;
@@ -158,7 +156,15 @@ public class ViewPage extends FragmentView
         _grid.AddGridColumn("End", "DisplayEndTime", timeWidth);
         _grid.AddGridColumn("Total", "DisplayTotalTime", timeWidth);
         _grid.AddGridColumn("Activity", "LogText", textWidth);
-        _grid.OnCellLongClick().Subscribe(new IEventHandler()
+        _grid.OnRowClick().Subscribe(new IEventHandler()
+        {
+            @Override
+            public void HandleEvent(Object sender, IEventArgs eventArgs)
+            {
+                _dataContext.EditRowCommand().Execute(eventArgs);
+            }
+        });
+        _grid.OnCellClick().Subscribe(new IEventHandler()
         {
             @Override
             public void HandleEvent(Object sender, IEventArgs eventArgs)
@@ -170,42 +176,6 @@ public class ViewPage extends FragmentView
         InitializeBindings();
 
         return view;
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        RequeryLogEntries();
-    }
-
-    private void RequeryLogEntries()
-    {
-        GridDataSource dataSource = new GridDataSource(_dataContext.LogEntries());
-        dataSource.GroupFields(_dataContext.GroupFields());
-        dataSource.IndexFields(_dataContext.IndexFields());
-
-        _grid.SetDataSource(dataSource);
-
-        UpdateCommands();
-
-        if (_topPosition < 0)
-        {
-            _topPosition = _dataContext.DefaultTopPosition();
-        }
-        _grid.SetTopPosition(_topPosition);
-    }
-
-    private void UpdateCommands()
-    {
-        if (_dataContext == null)
-        {
-            return;
-        }
-
-        _prevButton.setEnabled(_dataContext.PrevCommand().CanExecute(null));
-        _nextButton.setEnabled(_dataContext.NextCommand().CanExecute(null));
     }
 
     private void OpenTimePicker(int titleID)
@@ -228,7 +198,6 @@ public class ViewPage extends FragmentView
     private void OpenInputDialog(int titleID)
     {
         String value = (String)_dataContext.EditValue();
-
         ViewUtils.OpenInputDialog(this,
                 titleID,
                 value,
@@ -241,4 +210,34 @@ public class ViewPage extends FragmentView
                     }
                 });
     }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        RequeryLogEntries();
+    }
+
+    private void RequeryLogEntries()
+    {
+        GridDataSource dataSource = new GridDataSource(_dataContext.LogEntries());
+        dataSource.IndexFields(_dataContext.IndexFields());
+
+        _grid.SetDataSource(dataSource);
+
+        UpdateCommands();
+    }
+
+    private void UpdateCommands()
+    {
+        if (_dataContext == null)
+        {
+            return;
+        }
+
+        _prevButton.setEnabled(_dataContext.PrevCommand().CanExecute(null));
+        _nextButton.setEnabled(_dataContext.NextCommand().CanExecute(null));
+    }
+
 }

@@ -53,6 +53,18 @@ public class ContentProviderDataAccess implements IDataAccess
     }
 
     @Override
+    public int UpdateLogEntry(IDataLogEntry logEntry)
+    {
+        ContentValues values = ContentValuesLogEntry.ConvertToContentValues(logEntry);
+
+        String URL = Constants.PROVIDER_URL + "/log";
+        Uri uri = Uri.parse(URL);
+
+        int count = _contentResolver.update(uri, values, null, null);
+        return count;
+    }
+
+    @Override
     public IDataReader GetLogSummary()
     {
         String URL = Constants.PROVIDER_URL + "/logSummary";

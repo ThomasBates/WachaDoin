@@ -5,34 +5,34 @@ import ca.turbobutterfly.core.events.IEvent;
 
 public class Command implements ICommand
 {
-    private IEvent canExecuteChanged = new Event();
-    private ICommandListener commandListener;
+    private IEvent _canExecuteChanged = new Event();
+    private ICommandListener _commandListener;
+
+    public Command(ICommandListener commandListener)
+    {
+        _commandListener = commandListener;
+    }
 
     @Override
     public IEvent CanExecuteChanged()
     {
-        return canExecuteChanged;
+        return _canExecuteChanged;
     }
 
     @Override
-    public boolean CanExecute(Object parameters)
+    public boolean CanExecute(Object parameter)
     {
-        return commandListener.CanExecute(parameters);
+        return _commandListener.CanExecute(parameter);
     }
 
     @Override
-    public void Execute(Object parameters)
+    public void Execute(Object parameter)
     {
-        if (!CanExecute(parameters))
+        if (!CanExecute(parameter))
         {
             return;
         }
 
-        commandListener.Execute(parameters);
-    }
-
-    public Command(ICommandListener commandListener)
-    {
-        this.commandListener = commandListener;
+        _commandListener.Execute(parameter);
     }
 }

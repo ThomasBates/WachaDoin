@@ -13,5 +13,5 @@ public interface IDisplayOptions
     OptionsIntegerItem days_per_page();
     OptionsBooleanItem group_by_date();
     OptionsStringItem order();
-    OptionsIntegerItem snap();
+    OptionsIntegerItem round();
 }

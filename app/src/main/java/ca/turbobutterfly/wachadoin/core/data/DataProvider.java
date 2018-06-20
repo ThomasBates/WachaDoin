@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import ca.turbobutterfly.core.data.DataColumn;
+import ca.turbobutterfly.core.data.IDataColumn;
 import ca.turbobutterfly.core.data.IDataReader;
 import ca.turbobutterfly.core.data.IDataRow;
 import ca.turbobutterfly.core.data.IDataTable;
@@ -61,39 +62,6 @@ public class DataProvider implements IDataProvider
     }
 
     @Override
-    public String[] GetRecentLogText(boolean forceRead)
-    {
-        if ((_recentLogText == null) || forceRead)
-        {
-            List<String> list = new ArrayList<>();
-
-            IDataReader reader = _dataAccess.GetLogSummary();
-
-            _lastEndDate = new Date();
-            _lastLogText = "";
-
-            if (reader.Read())
-            {
-                _lastEndDate = DateUtils.ISO8601(reader.getString("MaxEndTime"), new Date());
-                _lastLogText = reader.getString("LogText");
-
-                list.add(reader.getString("LogText"));
-            }
-
-            while (reader.Read() && (list.size() < 20))
-            {
-                list.add(reader.getString("LogText"));
-            }
-
-            reader.Close();
-
-            _recentLogText = list.toArray(new String[list.size()]);
-        }
-
-        return _recentLogText;
-    }
-
-    @Override
     public boolean SaveLogEntry(Date startTime, Date endTime, String logText)
     {
         _lastEndDate = null;
@@ -135,7 +103,53 @@ public class DataProvider implements IDataProvider
     }
 
     @Override
-    public IDataTable GetLogEntries(Date rangeStart, Date rangeEnd, int snapTime)
+    public boolean UpdateLogEntry(Date startTime, Date endTime, String logText, String fieldName)
+    {
+        IDataLogEntry logEntry = new DataLogEntry();
+
+        logEntry.StartTime(DateUtils.ISO8601(startTime));
+        logEntry.EndTime(DateUtils.ISO8601(endTime));
+        logEntry.LogText(logText);
+        logEntry.FieldName(fieldName);
+
+        return (_dataAccess.UpdateLogEntry(logEntry) != 0);
+    }
+
+    @Override
+    public String[] GetRecentLogText(boolean forceRead)
+    {
+        if ((_recentLogText == null) || forceRead)
+        {
+            List<String> list = new ArrayList<>();
+
+            IDataReader reader = _dataAccess.GetLogSummary();
+
+            _lastEndDate = new Date();
+            _lastLogText = "";
+
+            if (reader.Read())
+            {
+                _lastEndDate = DateUtils.ISO8601(reader.getString("MaxEndTime"), new Date());
+                _lastLogText = reader.getString("LogText");
+
+                list.add(reader.getString("LogText"));
+            }
+
+            while (reader.Read() && (list.size() < 20))
+            {
+                list.add(reader.getString("LogText"));
+            }
+
+            reader.Close();
+
+            _recentLogText = list.toArray(new String[list.size()]);
+        }
+
+        return _recentLogText;
+    }
+
+    @Override
+    public IDataTable GetLogEntries(Date rangeStart, Date rangeEnd, boolean longDate, int roundTime)
     {
         _logEntries = new DataTable();
         _logEntries.AddColumn(new DataColumn("StartTime"));
@@ -154,7 +168,7 @@ public class DataProvider implements IDataProvider
             String endTime = reader.getString("EndTime");
             String logText = reader.getString("LogText");
 
-            AddLogEntryToTable(startTime, endTime, logText, snapTime);
+            AddLogEntryToTable(startTime, endTime, logText, longDate, roundTime);
         }
 
         reader.Close();
@@ -162,25 +176,36 @@ public class DataProvider implements IDataProvider
         return _logEntries;
     }
 
-    private void AddLogEntryToTable(String isoStartTime, String isoEndTime, String logText, int snapTime)
+    private void AddLogEntryToTable(String isoStartTime, String isoEndTime, String logText, boolean longDate, int roundTime)
     {
-        int snapTime_ms = snapTime * 60000;
-        int halfTime_ms = snapTime_ms / 2;
+        int roundTime_ms = roundTime * 60000;
+        int halfTime_ms = roundTime_ms / 2;
 
         Date startTime = DateUtils.ISO8601(isoStartTime, new Date(0));
         Date endTime = DateUtils.ISO8601(isoEndTime, new Date());
 
-        //  use only the minute portion for calculating time span.
-        long startTime_ms = ((startTime.getTime() + halfTime_ms) / snapTime_ms) * snapTime_ms;
-        long endTime_ms = ((endTime.getTime() + halfTime_ms) / snapTime_ms) * snapTime_ms;
-        startTime = new Date(startTime_ms);
-        endTime = new Date(endTime_ms);
+        //  round to the nearest round time.
+        long startTime_ms = ((startTime.getTime() + halfTime_ms) / roundTime_ms) * roundTime_ms;
+        long endTime_ms = ((endTime.getTime() + halfTime_ms) / roundTime_ms) * roundTime_ms;
+        Date roundedStartTime = new Date(startTime_ms);
+        Date roundedEndTime = new Date(endTime_ms);
+        //  calculate time span.
         Date totalTime = new Date(endTime_ms - startTime_ms);
+        //  midTime is used to determine the date of the entry.
+        //  can't use startTime or endTime in case either is on a midnight boundary.
         Date midTime = new Date(startTime_ms + (endTime_ms - startTime_ms) / 2);
 
-        String displayDate = DateUtils.LongDate(midTime);
-        String displayStartTime = DateUtils.ShortTime(startTime);
-        String displayEndTime = DateUtils.ShortTime(endTime);
+        String displayDate;
+        if (longDate)
+        {
+            displayDate = DateUtils.LongDate(midTime);
+        }
+        else
+        {
+            displayDate = DateUtils.ShortDate(midTime);
+        }
+        String displayStartTime = DateUtils.ShortTime(roundedStartTime);
+        String displayEndTime = DateUtils.ShortTime(roundedEndTime);
         String displayTotalTime = DateUtils.ShortTimeSpan(totalTime);
 
         if (TextUtils.equals(displayEndTime, "00:00"))
@@ -194,18 +219,9 @@ public class DataProvider implements IDataProvider
             displayTotalTime = "24:00";
         }
 
-//        _logEntries.AddColumn(new DataColumn("StartTime"));
-//        _logEntries.AddColumn(new DataColumn("EndTime"));
-//        _logEntries.AddColumn(new DataColumn("DisplayDate"));
-//        _logEntries.AddColumn(new DataColumn("DisplayStartTime"));
-//        _logEntries.AddColumn(new DataColumn("DisplayEndTime"));
-//        _logEntries.AddColumn(new DataColumn("DisplayTotalTime"));
-//        _logEntries.AddColumn(new DataColumn("LogText"));
-
-
         IDataRow row = _logEntries.NewRow();
-        row.Value("StartTime", isoStartTime);
-        row.Value("EndTime", isoEndTime);
+        row.Value("StartTime", startTime);
+        row.Value("EndTime", endTime);
         row.Value("DisplayDate", displayDate);
         row.Value("DisplayStartTime", displayStartTime);
         row.Value("DisplayEndTime", displayEndTime);

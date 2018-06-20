@@ -10,4 +10,7 @@ public interface IDataLogEntry
 
     String LogText();
     void LogText(String logText);
+
+    String FieldName();
+    void FieldName(String fieldName);
 }

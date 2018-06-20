@@ -1,14 +1,10 @@
 package ca.turbobutterfly.wachadoin.android.views;
 
 import android.Manifest;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,22 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.Calendar;
 import java.util.Date;
 
+import ca.turbobutterfly.android.utils.ReturnValueDelegate;
+import ca.turbobutterfly.android.utils.ViewUtils;
+import ca.turbobutterfly.android.views.FragmentView;
 import ca.turbobutterfly.core.events.EventHandler;
 import ca.turbobutterfly.core.events.IEventArgs;
 import ca.turbobutterfly.core.mvvm.IPropertyChangedEventArgs;
-import ca.turbobutterfly.android.views.FragmentView;
 import ca.turbobutterfly.core.utils.TextUtils;
 import ca.turbobutterfly.wachadoin.R;
 import ca.turbobutterfly.wachadoin.core.viewmodels.ExportPageViewModel;
+
 
 /**
  * A placeholder fragment containing a simple view.
@@ -44,7 +39,7 @@ public class ExportPage extends FragmentView
     private TextView _endDateTextView;
     private SwitchCompat _groupByDateSwitch;
     private TextView _logOrderTextView;
-    private TextView _snapTimeTextView;
+    private TextView _roundTimeTextView;
     private TextView _fileFormatTextView;
     private TextView _fileDeliveryTextView;
     private TextView _emailAddressTextView;
@@ -79,12 +74,12 @@ public class ExportPage extends FragmentView
                     _logOrderTextView.setText(entry);
                     break;
 
-                case "SnapTime":
+                case "RoundTime":
                     entry = GetListEntry(
-                            _dataContext.SnapTime().toString(),
+                            _dataContext.RoundTime().toString(),
                             R.array.pref_time_span_list_entries,
                             R.array.pref_time_span_list_values);
-                    _snapTimeTextView.setText(entry);
+                    _roundTimeTextView.setText(entry);
                     break;
 
                 case "FileFormat":
@@ -160,14 +155,14 @@ public class ExportPage extends FragmentView
     {
         if (_dataContext != null)
         {
-            _dataContext.PropertyChanged().Unsubscribe(_dataContextPropertyChangedEventHandler);
+            _dataContext.OnPropertyChanged().Unsubscribe(_dataContextPropertyChangedEventHandler);
         }
 
         _dataContext = (ExportPageViewModel) dataContext;
 
         if (_dataContext != null)
         {
-            _dataContext.PropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
+            _dataContext.OnPropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
         }
 
         InitializeBindings();
@@ -196,10 +191,10 @@ public class ExportPage extends FragmentView
         _logOrderTextView.setText(entry);
 
         entry = GetListEntry(
-                _dataContext.SnapTime().toString(),
+                _dataContext.RoundTime().toString(),
                 R.array.pref_time_span_list_entries,
                 R.array.pref_time_span_list_values);
-        _snapTimeTextView.setText(entry);
+        _roundTimeTextView.setText(entry);
 
         entry = GetListEntry(
                 _dataContext.FileFormat(),
@@ -220,7 +215,7 @@ public class ExportPage extends FragmentView
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater,
+            @NonNull LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState)
     {
@@ -278,16 +273,16 @@ public class ExportPage extends FragmentView
         });
         _logOrderTextView = view.findViewById(R.id.logOrderTextView);
 
-        layout = view.findViewById(R.id.snapTimeLayout);
+        layout = view.findViewById(R.id.roundTimeLayout);
         layout.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                OpenSnapTimeDialog();
+                OpenRoundTimeDialog();
             }
         });
-        _snapTimeTextView = view.findViewById(R.id.snapTimeTextView);
+        _roundTimeTextView = view.findViewById(R.id.roundTimeTextView);
 
         layout = view.findViewById(R.id.fileFormatLayout);
         layout.setOnClickListener(new View.OnClickListener()
@@ -361,47 +356,37 @@ public class ExportPage extends FragmentView
 
     private void OpenStartDatePicker()
     {
-        DatePickerFragment datePicker = new DatePickerFragment();
-        datePicker._initialDate = _dataContext.StartTime();
-        datePicker._listener = new DatePickerDialog.OnDateSetListener()
-        {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
-            {
-                Calendar c = Calendar.getInstance();
-                c.set(year, month, dayOfMonth, 0, 0);
-                _dataContext.StartTime(c.getTime());
-            }
-        };
-        datePicker.show(getFragmentManager(), "datePicker");
+        ViewUtils.OpenDatePicker(this,
+                R.string.export_page_from,
+                _dataContext.StartTime(),
+                new ReturnValueDelegate()
+                {
+                    @Override
+                    public void HandleReturnValue(Object value)
+                    {
+                        _dataContext.StartTime((Date)value);
+                    }
+                });
     }
 
     private void OpenEndDatePicker()
     {
-        DatePickerFragment datePicker = new DatePickerFragment();
-        datePicker._initialDate = _dataContext.EndTime();
-        datePicker._listener = new DatePickerDialog.OnDateSetListener()
-        {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
-            {
-                Calendar c = Calendar.getInstance();
-                c.set(year, month, dayOfMonth, 0, 0);
-                _dataContext.EndTime(c.getTime());
-            }
-        };
-
-        datePicker.show(getFragmentManager(), "datePicker");
-    }
-
-    public static interface ReturnValueDelegate
-    {
-        public void doReturnValue(String value);
+        ViewUtils.OpenDatePicker(this,
+                R.string.export_page_to,
+                _dataContext.EndTime(),
+                new ReturnValueDelegate()
+                {
+                    @Override
+                    public void HandleReturnValue(Object value)
+                    {
+                        _dataContext.EndTime((Date)value);
+                    }
+                });
     }
 
     private void OpenLogOrderDialog()
     {
-        OpenListDialog(
+        ViewUtils.OpenListDialog(this,
                 R.string.pref_export_order_title,
                 R.array.pref_order_list_entries,
                 R.array.pref_order_list_values,
@@ -409,33 +394,33 @@ public class ExportPage extends FragmentView
                 new ReturnValueDelegate()
                 {
                     @Override
-                    public void doReturnValue(String value)
+                    public void HandleReturnValue(Object value)
                     {
-                        _dataContext.LogOrder(value);
+                        _dataContext.LogOrder(value.toString());
                     }
                 });
     }
 
-    private void OpenSnapTimeDialog()
+    private void OpenRoundTimeDialog()
     {
-        OpenListDialog(
-                R.string.pref_export_snap_title,
+        ViewUtils.OpenListDialog(this,
+                R.string.pref_export_round_title,
                 R.array.pref_time_span_list_entries,
                 R.array.pref_time_span_list_values,
-                _dataContext.SnapTime().toString(),
+                _dataContext.RoundTime().toString(),
                 new ReturnValueDelegate()
                 {
                     @Override
-                    public void doReturnValue(String value)
+                    public void HandleReturnValue(Object value)
                     {
-                        _dataContext.SnapTime(Integer.parseInt(value));
+                        _dataContext.RoundTime(Integer.parseInt(value.toString()));
                     }
                 });
     }
 
     private void OpenFileFormatDialog()
     {
-        OpenListDialog(
+        ViewUtils.OpenListDialog(this,
                 R.string.pref_export_format_title,
                 R.array.pref_format_list_entries,
                 R.array.pref_format_list_values,
@@ -443,16 +428,16 @@ public class ExportPage extends FragmentView
                 new ReturnValueDelegate()
                 {
                     @Override
-                    public void doReturnValue(String value)
+                    public void HandleReturnValue(Object value)
                     {
-                        _dataContext.FileFormat(value);
+                        _dataContext.FileFormat(value.toString());
                     }
                 });
     }
 
     private void OpenFileDeliveryDialog()
     {
-        OpenListDialog(
+        ViewUtils.OpenListDialog(this,
                 R.string.pref_export_delivery_title,
                 R.array.pref_delivery_list_entries,
                 R.array.pref_delivery_list_values,
@@ -460,105 +445,25 @@ public class ExportPage extends FragmentView
                 new ReturnValueDelegate()
                 {
                     @Override
-                    public void doReturnValue(String value)
+                    public void HandleReturnValue(Object value)
                     {
-                        _dataContext.FileDelivery(value);
+                        _dataContext.FileDelivery(value.toString());
                     }
                 });
     }
 
     private void OpenEmailAddressDialog()
     {
-        OpenInputDialog(
+        ViewUtils.OpenInputDialog(this,
                 R.string.pref_export_email_title,
                 _dataContext.EmailAddress(),
                 new ReturnValueDelegate()
                 {
                     @Override
-                    public void doReturnValue(String value)
+                    public void HandleReturnValue(Object value)
                     {
-                        _dataContext.EmailAddress(value);
+                        _dataContext.EmailAddress(value.toString());
                     }
                 });
-    }
-
-    public static class DatePickerFragment
-            extends DialogFragment
-    {
-        Date _initialDate;
-        DatePickerDialog.OnDateSetListener _listener;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState)
-        {
-            Calendar c = Calendar.getInstance();
-            c.setTime(_initialDate);
-
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), _listener, year, month, day);
-        }
-    }
-
-    private void OpenListDialog(int titleId, int entriesId, int valuesId, String initialValue, final ReturnValueDelegate returnValueDelegate)
-    {
-        Resources res = getResources();
-        final String[] entries = res.getStringArray(entriesId);
-        final String[] values = res.getStringArray(valuesId);
-
-        int currentIndex = GetListIndex(initialValue, valuesId);
-
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setCancelable(true)
-                .setTitle(titleId)
-                .setSingleChoiceItems(entries, currentIndex, null)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-                {
-                    public void onClick( DialogInterface dialog, int whichButton)
-                    {
-                        ListView listView = ((AlertDialog)dialog).getListView();
-                        int which = listView.getCheckedItemPosition();
-
-                        returnValueDelegate.doReturnValue(values[which]);
-                    }
-                })
-                .create();
-        dialog.show();
-    }
-
-    private void OpenInputDialog(int titleId, String value, final ReturnValueDelegate returnValueDelegate)
-    {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
-        LayoutInflater inflater = this.getLayoutInflater();
-
-        final View dialogView = inflater.inflate(R.layout.input_dialog, null);
-        dialogBuilder.setView(dialogView);
-
-        final EditText inputEditText = (EditText) dialogView.findViewById(R.id.inputEditText);
-        inputEditText.setText(value);
-
-        dialogBuilder.setTitle(titleId);
-        //dialogBuilder.setMessage("Enter text below");
-        dialogBuilder.setPositiveButton("OK",
-                new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        returnValueDelegate.doReturnValue(inputEditText.getText().toString());
-                    }
-                });
-        dialogBuilder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        //pass
-                    }
-                });
-        AlertDialog dialog = dialogBuilder.create();
-        dialog.show();
     }
 }

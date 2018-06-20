@@ -9,9 +9,10 @@ import java.util.Locale;
 
 import ca.turbobutterfly.core.options.IOptionsProvider;
 import ca.turbobutterfly.android.options.OptionsPreferencesProvider;
-import ca.turbobutterfly.core.viewmodels.ViewModel;
+import ca.turbobutterfly.core.mvvm.ViewModel;
 
 import ca.turbobutterfly.wachadoin.R;
+import ca.turbobutterfly.wachadoin.android.activities.EditActivity;
 import ca.turbobutterfly.wachadoin.android.logfile.LogFileDeliveryFactory;
 import ca.turbobutterfly.wachadoin.android.receivers.NotificationHelper;
 import ca.turbobutterfly.wachadoin.android.data.ContentProviderDataAccess;
@@ -21,6 +22,8 @@ import ca.turbobutterfly.wachadoin.core.data.IDataProvider;
 import ca.turbobutterfly.wachadoin.core.logfile.ILogFileDeliveryFactory;
 import ca.turbobutterfly.wachadoin.core.options.IMainOptions;
 import ca.turbobutterfly.wachadoin.core.options.MainOptions;
+import ca.turbobutterfly.wachadoin.core.viewmodels.EditActivityViewModel;
+import ca.turbobutterfly.wachadoin.core.viewmodels.EditPageViewModel;
 import ca.turbobutterfly.wachadoin.core.viewmodels.ExportPageViewModel;
 import ca.turbobutterfly.wachadoin.core.viewmodels.MainPageViewModel;
 import ca.turbobutterfly.wachadoin.core.viewmodels.ViewPageViewModel;
@@ -67,6 +70,23 @@ public class Bootstrapper
         IMainOptions mainOptions = ComposeMainOptions(context);
 
         return new ViewPageViewModel(dataProvider, mainOptions);
+    }
+
+    public static ViewModel ComposeEditActivityViewModel(Context context)
+    {
+        IDataProvider dataProvider = ComposeDataProvider(context);
+        IMainOptions mainOptions = ComposeMainOptions(context);
+
+        ViewModel editPageViewModel = new EditPageViewModel(dataProvider, mainOptions);
+        ViewModel editRowPageViewModel = null; // new EditPageViewModel(dataProvider, mainOptions);
+        ViewModel insertRowPageViewModel = null; // new EditPageViewModel(dataProvider, mainOptions);
+        ViewModel deleteRowPageViewModel = null; // new EditPageViewModel(dataProvider, mainOptions);
+
+        return new EditActivityViewModel(
+                editPageViewModel,
+                editRowPageViewModel,
+                insertRowPageViewModel,
+                deleteRowPageViewModel);
     }
 
     public static ViewModel ComposeExportPageViewModel(Context context)

@@ -17,7 +17,7 @@ class DisplayOptions extends OptionsGroup implements IDisplayOptions
     private OptionsIntegerItem _days_per_page = new OptionsIntegerItem(this, "days_per_page", 7, true);
     private OptionsBooleanItem _group_by_date = new OptionsBooleanItem(this, "group_by_date", false);
     private OptionsStringItem _order = new OptionsStringItem(this, "order", "Ascending");
-    private OptionsIntegerItem _snap = new OptionsIntegerItem(this, "snap", 1, true);
+    private OptionsIntegerItem _round = new OptionsIntegerItem(this, "round", 1, true);
 
     public DisplayOptions(IOptionsGroup group, String name)
     {
@@ -30,5 +30,5 @@ class DisplayOptions extends OptionsGroup implements IDisplayOptions
     public OptionsIntegerItem days_per_page() { return _days_per_page; }
     public OptionsBooleanItem group_by_date() { return _group_by_date; }
     public OptionsStringItem order() { return _order; }
-    public OptionsIntegerItem snap() { return _snap; }
+    public OptionsIntegerItem round() { return _round; }
 }

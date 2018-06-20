@@ -86,14 +86,14 @@ public class MainPage extends FragmentView
     {
         if (_dataContext != null)
         {
-            _dataContext.PropertyChanged().Unsubscribe(_dataContextPropertyChangedEventHandler);
+            _dataContext.OnPropertyChanged().Unsubscribe(_dataContextPropertyChangedEventHandler);
         }
 
         _dataContext = (MainPageViewModel) dataContext;
 
         if (_dataContext != null)
         {
-            _dataContext.PropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
+            _dataContext.OnPropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
         }
 
         InitializeBindings();

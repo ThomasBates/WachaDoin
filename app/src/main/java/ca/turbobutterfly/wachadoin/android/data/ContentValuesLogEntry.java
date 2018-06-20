@@ -55,6 +55,18 @@ class ContentValuesLogEntry implements IDataLogEntry, IAdapter
         _values.put("LogText", logText);
     }
 
+    @Override
+    public String FieldName()
+    {
+        return _values.getAsString("FieldName");
+    }
+
+    @Override
+    public void FieldName(String fieldName)
+    {
+        _values.put("FieldName", fieldName);
+    }
+
     public static ContentValues ConvertToContentValues(IDataLogEntry logEntry)
     {
         if (logEntry instanceof IAdapter)
@@ -67,11 +79,31 @@ class ContentValuesLogEntry implements IDataLogEntry, IAdapter
         //  logEntry is not wrapping a ContentValues instance.
         //  Create one, and wrap it temporarily to set the values.
         ContentValues values = new ContentValues();
-        IDataLogEntry insertLogEntry = new ContentValuesLogEntry(values);
+        IDataLogEntry newLogEntry = new ContentValuesLogEntry(values);
 
-        insertLogEntry.StartTime(logEntry.StartTime());
-        insertLogEntry.EndTime(logEntry.EndTime());
-        insertLogEntry.LogText(logEntry.LogText());
+        String value = logEntry.StartTime();
+        if (value != null)
+        {
+            newLogEntry.StartTime(value);
+        }
+
+        value = logEntry.EndTime();
+        if (value != null)
+        {
+            newLogEntry.EndTime(value);
+        }
+
+        value = logEntry.LogText();
+        if (value != null)
+        {
+            newLogEntry.LogText(value);
+        }
+
+        value = logEntry.FieldName();
+        if (value != null)
+        {
+            newLogEntry.FieldName(value);
+        }
 
         return values;
     }

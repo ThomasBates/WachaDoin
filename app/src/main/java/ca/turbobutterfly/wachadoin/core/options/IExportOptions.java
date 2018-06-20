@@ -6,9 +6,6 @@ import ca.turbobutterfly.core.options.OptionsStringItem;
 
 public interface IExportOptions
 {
-    OptionsBooleanItem group_by_date();
-    OptionsStringItem order();
-    OptionsIntegerItem snap();
     OptionsStringItem format();
     OptionsStringItem delivery();
     OptionsStringItem email();
