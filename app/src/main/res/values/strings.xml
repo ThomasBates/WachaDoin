@@ -18,7 +18,7 @@
 
     <!-- View Log Page ========================================================================= -->
     <string name="view_page_prev_button">&lt;</string>
-    <string name="view_page_range">September 31, 2018</string>
+    <string name="view_page_range">Wednesday, September 31, 2018</string>
     <string name="view_page_next_button">&gt;</string>
     <string name="view_page_edit_start_time">Start Time</string>
     <string name="view_page_edit_end_time">End Time</string>
@@ -30,6 +30,12 @@
     <string name="export_page_range">September 31, 2018</string>
     <string name="export_page_export_button">\nExport\n</string>
     <string name="export_page_tap">\nTap an item to change it for this time only.\n</string>
+
+    <!-- About Page ============================================================================ -->
+    <string name="about_page_title">WachaDoin 2.0</string>
+    <string name="about_page_turbobutterfly">TurboButterfly</string>
+    <string name="about_page_developer">Developer: Thomas Bates</string>
+    <string name="about_page_email">thomas.bates@shaw.ca</string>
 
     <!-- General Preferences =================================================================== -->
     <string name="pref_general_header">General</string>

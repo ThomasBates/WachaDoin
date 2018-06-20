@@ -78,7 +78,8 @@ public class MainPageViewModel extends ViewModel
             long minutes = milliseconds / (60 * 1000);
             String plural = ((minutes == 1) ? "" : "s");
             String formattedInstruction = String.format(_instructionFormat, minutes, plural);
-            if (minutes > _mainOptions.Notification().delay().Value())
+            if (minutes > _mainOptions.Notification().delay().Value()
+                        + _mainOptions.Notification().snooze().Value())
             {
                 formattedInstruction = formattedInstruction
                         + String.format(_sinceFormat, DateUtils.ShortTime(_startTime));;
