@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity
         dialogBuilder.setView(dialogView);
 
         dialogBuilder.setTitle(R.string.about_page_title);
-        //dialogBuilder.setPositiveButton("OK", null);
         AlertDialog dialog = dialogBuilder.create();
         dialog.show();
 

@@ -25,7 +25,7 @@
         android:backgroundTint="@color/colorPrimary"
         android:textAlignment="center"
         android:paddingTop="20dp"
-        android:text="@string/app_caption"
+        android:text="@string/main_page_log_prompt"
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 

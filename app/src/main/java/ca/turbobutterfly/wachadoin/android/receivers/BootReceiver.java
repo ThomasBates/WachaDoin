@@ -6,8 +6,6 @@ import android.content.Intent;
 
 import ca.turbobutterfly.wachadoin.android.bootstrapper.Bootstrapper;
 
-//  https://github.com/commonsguy/cw-advandroid/tree/master/SystemServices/Alarm/
-
 public class BootReceiver extends BroadcastReceiver
 {
     @Override

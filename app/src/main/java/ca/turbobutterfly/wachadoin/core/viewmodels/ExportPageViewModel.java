@@ -25,9 +25,12 @@ public class ExportPageViewModel extends ViewModel
     //  Variables ----------------------------------------------------------------------------------
 
     //  Injected dependencies
-    private IDataProvider _dataProvider;
-    private IMainOptions _mainOptions;
-    private ILogFileDeliveryFactory _logFileDeliveryFactory;
+    private final IDataProvider _dataProvider;
+    private final IMainOptions _mainOptions;
+    private final ILogFileDeliveryFactory _logFileDeliveryFactory;
+    private final String _exportInProgressText;
+    private final String _exportSuccessfulText;
+    private final String _exportFailedText;
 
     //  Property backers
     private Date _startTime;
@@ -35,6 +38,16 @@ public class ExportPageViewModel extends ViewModel
     private Date _endTime;
     private String _endDateText;
 
+    private ICommand _exportCommand = new Command(new CommandListener()
+    {
+        @Override
+        public void Execute(Object parameters)
+        {
+            DoExport();
+        }
+    });
+
+    //  Internal
     private Boolean _use_reporting_period;
     private Integer _reporting_period;
     private Date _reporting_period_start;
@@ -48,29 +61,22 @@ public class ExportPageViewModel extends ViewModel
     private int _statusColor;
     private String _statusText;
 
-    private ICommand _exportCommand = new Command(new CommandListener()
-    {
-        @Override
-        public void Execute(Object parameters)
-        {
-            DoExport();
-        }
-    });
-
-    //  Constants
-//    private final long _msPerHour = 1000 * 60 * 60;
-//    private final long _msPerDay = _msPerHour * 24;
-
     //  Constructors -------------------------------------------------------------------------------
 
     public ExportPageViewModel(
             IDataProvider dataProvider,
             IMainOptions mainOptions,
-            ILogFileDeliveryFactory logFileDeliveryFactory)
+            ILogFileDeliveryFactory logFileDeliveryFactory,
+            String exportInProgressText,
+            String exportSuccessfulText,
+            String exportFailedText)
     {
         _dataProvider = dataProvider;
         _mainOptions = mainOptions;
         _logFileDeliveryFactory = logFileDeliveryFactory;
+        _exportInProgressText = exportInProgressText;
+        _exportSuccessfulText = exportSuccessfulText;
+        _exportFailedText = exportFailedText;
 
         _use_reporting_period = _mainOptions.Display().use_reporting_period().Value();
         _reporting_period = _mainOptions.Display().reporting_period().Value();
@@ -145,9 +151,6 @@ public class ExportPageViewModel extends ViewModel
 
     public void StartTime(Date startTime)
     {
-        //  Round to nearest hour.
-        //startTime = new Date((startTime.getTime() / _msPerHour) * _msPerHour);
-
         if (DateUtils.equals(startTime, _startTime))
         {
             return;
@@ -184,9 +187,6 @@ public class ExportPageViewModel extends ViewModel
 
     public void EndTime(Date endTime)
     {
-        //  Round to nearest hour.
-        //endTime = new Date((endTime.getTime() / _msPerHour) * _msPerHour);
-
         if (DateUtils.equals(endTime, _endTime))
         {
             return;
@@ -345,21 +345,21 @@ public class ExportPageViewModel extends ViewModel
 
     private void DoExport()
     {
-        StatusColor(0xFF0000FF); // Blue
-        StatusText("Export in Progress.");
+        StatusColor(0x0000FF); // Blue
+        StatusText(_exportInProgressText);
 
         String logFile = CreateLogFile();
         boolean success = DeliverLogFile(logFile);
 
         if (success)
         {
-            StatusColor(0xFF008800); // Green
-            StatusText("Export Successful!");
+            StatusColor(0x008800); // Green
+            StatusText(_exportSuccessfulText);
         }
         else
         {
-            StatusColor(0xFFFF0000); // Red
-            StatusText("Export Failed!");
+            StatusColor(0xFF0000); // Red
+            StatusText(_exportFailedText);
         }
     }
 

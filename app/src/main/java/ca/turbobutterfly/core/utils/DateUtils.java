@@ -40,17 +40,6 @@ public class DateUtils
         if (_longDateFormat == null)
         {
             _longDateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.FULL);
-
-//            final String format = Settings.System.getString(getContentResolver(), Settings.System.DATE_FORMAT);
-//
-//            if (TextUtils.isEmpty(format))
-//            {
-//                _longDateFormat = android.text.format.DateFormat.getMediumDateFormat(getApplicationContext());
-//            }
-//            else
-//            {
-//                _longDateFormat = new SimpleDateFormat(format);
-//            }
         }
         return _longDateFormat;
     }

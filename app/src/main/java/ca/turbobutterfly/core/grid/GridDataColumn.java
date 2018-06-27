@@ -4,20 +4,20 @@ import ca.turbobutterfly.core.data.IDataColumn;
 
 public class GridDataColumn implements IGridDataColumn
 {
-    private IDataColumn _column;
+    private IDataColumn _dataColumn;
 
-    public GridDataColumn(IDataColumn column)
+    public GridDataColumn(IDataColumn dataColumn)
     {
-        _column = column;
+        _dataColumn = dataColumn;
     }
 
     public IDataColumn DataColumn()
     {
-        return _column;
+        return _dataColumn;
     }
 
     public String Name()
     {
-        return _column.Name();
+        return _dataColumn.Name();
     }
 }

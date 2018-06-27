@@ -43,7 +43,6 @@ public class NotificationHelper
     private boolean _doNotifications;
     private boolean _doPopupApp;
     private String _ringtone;
-    private boolean _doVibrate;
     private long _waitTime;
     private long _snoozeTime;
 
@@ -68,7 +67,6 @@ public class NotificationHelper
         _doNotifications = _options.enabled().Value();
         _doPopupApp = _options.popup_app().Value();
         _ringtone = _options.ringtone().Value();
-        _doVibrate = _options.vibrate().Value();
         _waitTime = _options.delay().Value() * 60000;
         _snoozeTime = _options.snooze().Value() * 60000;
     }
@@ -154,7 +152,7 @@ public class NotificationHelper
                 _channelID)
                 //.setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)
-                .setContentTitle("Wacha Doin?")
+                .setContentTitle(_context.getString(R.string.notification_title))
                 //.setContentText("Tap to record your activity")
                 .setContentText(_lastLogText)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -167,9 +165,9 @@ public class NotificationHelper
         String plural = ((minutes == 1) ? "" : "s");
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder);
-        inboxStyle.setBigContentTitle("Wacha Doin?");
+        inboxStyle.setBigContentTitle(_context.getString(R.string.notification_title));
         inboxStyle.addLine(_lastLogText);
-        inboxStyle.addLine(_context.getString(R.string.main_page_notification_prompt, minutes, plural));
+        inboxStyle.addLine(_context.getString(R.string.notification_prompt, minutes, plural));
 
         Notification notification = builder.build();
 
@@ -259,7 +257,7 @@ public class NotificationHelper
         }
         catch (IOException e)
         {
-            System.out.println("OOPS");
+            //System.out.println("OOPS");
         }
     }
 }

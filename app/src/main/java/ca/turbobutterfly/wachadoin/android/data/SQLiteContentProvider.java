@@ -80,22 +80,13 @@ public class SQLiteContentProvider extends ContentProvider
             @Nullable String selection,
             @Nullable String[] selectionArgs)
     {
-        int count = 0;
-//        switch (uriMatcher.match(uri))
-//        {
+        switch (uriMatcher.match(uri))
+        {
 //            case LOG:
-//                count = _database.delete(LOG_TABLE_NAME, selection, selectionArgs);
-//                break;
-//            default:
-//                throw new IllegalArgumentException("Unsupported URI: " + uri);
-//        }
-//
-//        Context context = getContext();
-//        if (context != null)
-//        {
-//            context.getContentResolver().notifyChange(uri, null);
-//        }
-        return count;
+//                return DeleteLogRecord(uri);
+            default:
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        }
     }
 
     @Override
@@ -105,7 +96,6 @@ public class SQLiteContentProvider extends ContentProvider
             @Nullable String selection,
             @Nullable String[] selectionArgs)
     {
-        int count = 0;
         switch (uriMatcher.match(uri))
         {
             case LOG:
@@ -119,16 +109,11 @@ public class SQLiteContentProvider extends ContentProvider
     @Override
     public String getType(@NonNull Uri uri)
     {
-//        switch (uriMatcher.match(uri))
-//        {
-//            //  Get all log records
-//            case LOG:
-//                return "vnd.android.cursor.dir/vnd.example.students";
-//
-//            default:
-//                throw new IllegalArgumentException("Unsupported URI: " + uri);
-//        }
-        return "";
+        switch (uriMatcher.match(uri))
+        {
+            default:
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        }
     }
 
     private Uri InsertNewLogRecord(Uri uri, ContentValues values)

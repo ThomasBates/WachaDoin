@@ -23,24 +23,6 @@ interface IOptionsItem<T>
     T DefaultValue();
     void DefaultValue(T defaultValue);
 
-//    String ValueString();
-//    void ValueString(String valueString);
-//
-//    String DefaultString();
-//    void DefaultString(String defaultString);
-//
-//    boolean IsEmpty();
-
-//    String AsString();
-//    void AsString(String asString);
-
     //  Methods ------------------------------------------------------------------------------------
 
-//    void SetValueFromString();
-//    void SetStringFromValue();
-//
-//    T GetValueFromString(String value, T defaultValue);
-//    String GetStringFromValue(T value);
-//
-//    void RestoreDefaults();
 }

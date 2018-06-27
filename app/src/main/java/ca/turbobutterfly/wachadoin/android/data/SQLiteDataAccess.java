@@ -43,9 +43,9 @@ public class SQLiteDataAccess implements IDataAccess
             db.execSQL("  --  SQLiteDataAccess.DatabaseHelper.onCreate  --  \n" +
                     "CREATE TABLE " + LOG_TABLE_NAME + " \n" +
                     "( \n" +
-                    "  StartTime TEXT NOT NULL, \n" +
-                    "  EndTime TEXT PRIMARY KEY NOT NULL, \n" +
-                    "  LogText TEXT \n" +
+                    "    StartTime TEXT NOT NULL, \n" +
+                    "    EndTime TEXT PRIMARY KEY NOT NULL, \n" +
+                    "    LogText TEXT \n" +
                     ");");
         }
 

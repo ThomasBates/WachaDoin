@@ -63,6 +63,7 @@ public class LogFileEmailDelivery implements ILogFileDelivery
 
             if (file.exists())
             {
+                //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
 
@@ -80,8 +81,7 @@ public class LogFileEmailDelivery implements ILogFileDelivery
             emailIntent.setData(Uri.parse("mailto:"));
             emailIntent.setType("text/plain");
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{_emailAddress});
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "WachaDoin Export");
-            //emailIntent.putExtra(Intent.EXTRA_TEXT, "WachaDoin Export");
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "WachaDoin Log Export");
             emailIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
 
             Intent chosenIntent = Intent.createChooser(emailIntent, "Send mail...");

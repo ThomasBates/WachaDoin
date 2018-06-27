@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">WachaDoin</string>
-    <string name="app_caption">WachaDoin</string>
+    <string name="app_caption">WachaDoin?</string>
 
     <string name="file_provider_authority" translatable="false">ca.turbobutterfly.wachadoin.fileprovider</string>
 
@@ -9,11 +9,13 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">About WachaDoin</string>
 
+    <string name="notification_title">WachaDoin?</string>
+    <string name="notification_prompt">%d minute%s</string>
+
     <!-- Main Page ============================================================================= -->
     <string name="main_page_sample_time">2018–06–20 12:00:00</string>
     <string name="main_page_log_prompt">Briefly describe what you have been\nworking on for the last %d minute%s.</string>
     <string name="main_page_log_since">\n(Since %s)</string>
-    <string name="main_page_notification_prompt">%d minute%s</string>
     <string name="main_page_save_button">\nSave\n</string>
 
     <!-- View Log Page ========================================================================= -->
@@ -30,12 +32,16 @@
     <string name="export_page_range">September 31, 2018</string>
     <string name="export_page_export_button">\nExport\n</string>
     <string name="export_page_tap">\nTap an item to change it for this time only.\n</string>
+    <string name="export_page_export_in_progress">Export in Progress.</string>
+    <string name="export_page_export_successful">Export Successful!</string>
+    <string name="export_page_export_failed">Export Failed!</string>
 
     <!-- About Page ============================================================================ -->
     <string name="about_page_title">WachaDoin 2.0</string>
     <string name="about_page_turbobutterfly">TurboButterfly</string>
-    <string name="about_page_developer">Developer: Thomas Bates</string>
-    <string name="about_page_email">thomas.bates@shaw.ca</string>
+    <string name="about_page_developer">Copyright © 2018 Thomas Bates</string>
+    <string name="about_page_email">realturbobutterfly@gmail.com</string>
+    <string name="about_page_rating">\nIf you find this product useful, please provide a positive rating in the Google Play Store.\n\nThank you.\n</string>
 
     <!-- General Preferences =================================================================== -->
     <string name="pref_general_header">General</string>

@@ -1,4 +1,4 @@
-package ca.turbobutterfly.views;
+package ca.turbobutterfly.android.views;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -346,7 +346,7 @@ public class ExportPage extends FragmentView
             if (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_DENIED)
             {
-                Log.d("permission", "permission denied to WRITE_EXTERNAL_STORAGE - requesting it");
+                //Log.d("permission", "permission denied to WRITE_EXTERNAL_STORAGE - requesting it");
                 String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
                 requestPermissions(permissions, 1);

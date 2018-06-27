@@ -9,7 +9,6 @@ public interface INotificationOptions
     OptionsBooleanItem enabled();
     OptionsBooleanItem popup_app();
     OptionsStringItem ringtone();
-    OptionsBooleanItem vibrate();
     OptionsIntegerItem delay();
     OptionsIntegerItem snooze();
 }

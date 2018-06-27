@@ -56,22 +56,12 @@ public class LogFileUSBDelivery implements ILogFileDelivery
                 return false;
             }
 
-            boolean ok;
-            File storage = Environment.getExternalStorageDirectory();
-            ok = storage.canWrite();
             File root = new File(Environment.getExternalStorageDirectory(), "WachaDoin");
-            //File root = new File(Environment.getExternalStorageDirectory(), "Download");
-            ok = root.canWrite();
             if (!root.exists())
             {
-                ok = root.mkdirs();
-                if (!ok)
-                {
-                    ok = root.mkdir();
-                }
+                //noinspection ResultOfMethodCallIgnored
+                root.mkdirs();
             }
-
-
 
             //  Find unused file name.
             String filename = "WachaDoinLog" + _fileExtension;
@@ -87,12 +77,7 @@ public class LogFileUSBDelivery implements ILogFileDelivery
                 }
 
                 retry++;
-                filename = String.format(Locale.getDefault(), "WachaDoin (%d)%s", retry, _fileExtension);
-            }
-            ok = file.canWrite();
-            if (!ok)
-            {
-//                return false;
+                filename = String.format(Locale.getDefault(), "WachaDoinLog (%d)%s", retry, _fileExtension);
             }
 
             //  Store logFile to external storage.

@@ -15,12 +15,6 @@ class OptionsItem<T> implements IOptionsItem<T>
     private IOptionsProvider _provider;
     private String _nameSeparator;
 
-//    private T _previousValue;
-
-//    private String _valueString = "";
-//    private String _defaultString = "";
-//    private String _previousString = "";
-
     private IEvent _valueChanged = new Event();
 
     //  Constructors -------------------------------------------------------------------------------
@@ -82,8 +76,6 @@ class OptionsItem<T> implements IOptionsItem<T>
     public T Value()
     {
         ReadValue(_provider, FullName(), _defaultValue);
-        //_value = _provider.Read(_name, _defaultValue);
-        //SetValueFromString();
         return _value;
     }
 
@@ -216,23 +208,4 @@ class OptionsItem<T> implements IOptionsItem<T>
     protected void WriteValue(IOptionsProvider provider, String name, T value)
     {
     }
-
-//    private void LoadString()
-//    {
-//        String tempString = _group.ReadString(_name);
-//        if ((tempString != null) && (!tempString.isEmpty()))
-//        {
-//            _valueString = tempString;
-//        }
-//    }
-//
-//    private void SaveString()
-//    {
-//        _group.WriteString(_name, _valueString);
-//    }
-//
-//    private void OnValueChanged(ValueChangedEventArgs eventArgs)
-//    {
-//        _valueChanged.Publish(this, eventArgs);
-//    }
 }

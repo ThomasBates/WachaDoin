@@ -91,7 +91,6 @@ public class ViewPageViewModel extends ViewModel
     private boolean _insertingRow;
     private Date _insertStartTime;
     private Date _insertEndTime;
-    private String _insertLogText;
 
     //  Constants
 //    private final long _msPerDay = 1000 * 60 * 60 * 24;
@@ -365,12 +364,12 @@ public class ViewPageViewModel extends ViewModel
                 return;
 
             case "LogText":
-                _insertLogText = (String)editValue;
+                String insertLogText = (String)editValue;
 
                 boolean updated = _dataProvider.SaveLogEntry(
                         _insertStartTime,
                         _insertEndTime,
-                        _insertLogText);
+                        insertLogText);
 
                 _dataRow = null;
                 _dataColumn = null;

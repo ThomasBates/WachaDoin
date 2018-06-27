@@ -6,7 +6,7 @@ import ca.turbobutterfly.core.events.IEvent;
 
 public interface INotifyDataErrorInfo
 {
-    public IEvent OnErrorsChanged();
-    public Boolean HasErrors();
-    public Collection<String> GetErrors(String propertyName);
+    IEvent OnErrorsChanged();
+    Boolean HasErrors();
+    Collection<String> GetErrors(String propertyName);
 }

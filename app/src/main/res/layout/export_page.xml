@@ -184,6 +184,7 @@
         android:layout_margin="5dp">
 
         <TextView
+            android:id="@+id/emailAddressLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -195,6 +196,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_below="@id/emailAddressLabel"
             android:text="roboturbo2@gmail.com"
             android:textColor="@android:color/black"
             android:textAlignment="center"

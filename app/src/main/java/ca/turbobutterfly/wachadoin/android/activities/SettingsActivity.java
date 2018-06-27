@@ -43,32 +43,6 @@ import ca.turbobutterfly.wachadoin.R;
  * API Guide</a> for more information on developing a Settings UI.
  */
 
-/*
-
-Notifications
-  - (Reminder enabled)
-  - Popup app
-  - Ringtone
-  - Vibrate
-  - Delay Time
-  - Snooze Time
-
-Schedule
-  - Sunday
-  - Monday
-  - Tuesday
-  - Wednesday
-  - Thursday
-  - Friday
-  - Saturday
-
-Export
-  - Format (Text, Excel, Other)
-  - Delivery (Email, USB, Other)
-  - Recipient Email Address
-
-
- */
 public class SettingsActivity extends AppCompatPreferenceActivity
 {
     private static Preference.OnPreferenceClickListener _onPreferenceClickListener = new Preference.OnPreferenceClickListener()
@@ -92,6 +66,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         }
     };
 
+    //  TODO: This is a horrible hack, but I am not sure how else to do this.
     private static PreferenceFragment _displayFragment;
 
     /**
@@ -106,13 +81,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue)
         {
-//              //  TODO: This is a horrible hack, but I can't figure out any other way to do this.
-//            if (preference == null)
-//            {
-//                _activity = (PreferenceActivity) value;
-//                return false;
-//            }
-
             String stringValue = newValue.toString();
 
             if (preference instanceof ListPreference)
@@ -217,27 +185,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity
     {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #_onPreferenceChangeListener
-     */
-    private static void SetupPreferenceVisible(
-            PreferenceFragment fragment,
-            Preference preference,
-            boolean isVisible)
-    {
-        if (!isVisible)
-        {
-            PreferenceScreen screen = fragment.getPreferenceScreen();
-            screen.removePreference(preference);
-        }
     }
 
     /**
@@ -441,7 +388,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
     }
 
     /**
-     * This fragment shows data and sync preferences only. It is used when the
+     * This fragment shows display preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -519,7 +466,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
     }
 
     /**
-     * This fragment shows notification preferences only. It is used when the
+     * This fragment shows export preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

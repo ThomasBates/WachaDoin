@@ -216,13 +216,11 @@ public class MainPageViewModel extends ViewModel
     private void DoPause()
     {
         _timer.Active(false);
-        //_timerHandler.removeCallbacks(_timerRunnable);
     }
 
     private void DoResume()
     {
         _timer.Active(true);
-        //_timerHandler.postDelayed(_timerRunnable, 0);
 
         RecentLogText(_dataProvider.GetRecentLogText(true));
         _startTime = _dataProvider.GetLastEndTime();

@@ -10,9 +10,6 @@ public interface IOptionsProvider
 
     //  Methods ------------------------------------------------------------------------------------
 
-//    <T> void Write(String name, T value);
-//    <T> T Read(String name, T defaultValue);
-
     void WriteString(String name, String value);
     String ReadString(String name, String defaultValue);
 
@@ -27,8 +24,4 @@ public interface IOptionsProvider
 
     void WriteDate(String name, Date value);
     Date ReadDate(String name, Date defaultValue);
-
-//    String[] GetChildNames(String name);
-
-//    void Delete(String name);
 }

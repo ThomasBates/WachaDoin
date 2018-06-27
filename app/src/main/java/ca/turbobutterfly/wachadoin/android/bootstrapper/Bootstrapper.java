@@ -27,28 +27,6 @@ import ca.turbobutterfly.wachadoin.core.viewmodels.ViewPageViewModel;
 
 public class Bootstrapper
 {
-    public static IMainOptions ComposeMainOptions(Context context)
-    {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        IOptionsProvider provider = new OptionsPreferencesProvider(sharedPreferences);
-
-        return new MainOptions(provider, "pref");
-    }
-
-    public static IDataProvider ComposeDataProvider(Context context)
-    {
-        IDataAccess dataAccess = new ContentProviderDataAccess(context.getContentResolver());
-        //IDataAccess dataAccess = new SQLiteDataAccess(this);
-        IMainOptions mainOptions = ComposeMainOptions(context);
-
-        return new DataProvider(dataAccess, mainOptions);
-    }
-
-    private static ILogFileDeliveryFactory ComposeLogFileDeliveryFactory(Context context)
-    {
-        return new LogFileDeliveryFactory(context);
-    }
-
     public static ViewModel ComposeMainPageViewModel(Context context)
     {
         IDataProvider dataProvider = ComposeDataProvider(context);
@@ -76,7 +54,10 @@ public class Bootstrapper
         IMainOptions mainOptions = ComposeMainOptions(context);
         ILogFileDeliveryFactory factory = ComposeLogFileDeliveryFactory(context);
 
-        return new ExportPageViewModel(dataProvider, mainOptions, factory);
+        return new ExportPageViewModel(dataProvider, mainOptions, factory,
+                context.getString(R.string.export_page_export_in_progress),
+                context.getString(R.string.export_page_export_successful),
+                context.getString(R.string.export_page_export_failed));
     }
 
     public static NotificationHelper ComposeNotificationHelper(Context context)
@@ -85,5 +66,27 @@ public class Bootstrapper
         IMainOptions mainOptions = ComposeMainOptions(context);
 
         return new NotificationHelper(context, dataProvider, mainOptions.Notification());
+    }
+
+    private static IMainOptions ComposeMainOptions(Context context)
+    {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        IOptionsProvider provider = new OptionsPreferencesProvider(sharedPreferences);
+
+        return new MainOptions(provider, "pref");
+    }
+
+    private static IDataProvider ComposeDataProvider(Context context)
+    {
+        IDataAccess dataAccess = new ContentProviderDataAccess(context.getContentResolver());
+        //IDataAccess dataAccess = new SQLiteDataAccess(this);
+        IMainOptions mainOptions = ComposeMainOptions(context);
+
+        return new DataProvider(dataAccess, mainOptions);
+    }
+
+    private static ILogFileDeliveryFactory ComposeLogFileDeliveryFactory(Context context)
+    {
+        return new LogFileDeliveryFactory(context);
     }
 }
