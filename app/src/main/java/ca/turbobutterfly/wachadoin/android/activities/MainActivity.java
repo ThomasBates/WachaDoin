@@ -1,11 +1,18 @@
 package ca.turbobutterfly.wachadoin.android.activities;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,9 +27,14 @@ import ca.turbobutterfly.core.mvvm.ViewModel;
 import ca.turbobutterfly.android.views.FragmentView;
 import ca.turbobutterfly.wachadoin.R;
 import ca.turbobutterfly.wachadoin.android.bootstrapper.Bootstrapper;
+import ca.turbobutterfly.wachadoin.databinding.MainActivityBinding;
 
 public class MainActivity extends AppCompatActivity
 {
+    private static final int PERMISSION_REQUEST_CODE = 112;
+
+    private MainActivityBinding binding;
+
     private EventHandler _dataContextPropertyChangedEventHandler = new EventHandler()
     {
         @Override
@@ -43,16 +55,44 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        binding = MainActivityBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
 
         ViewModel dataContext = Bootstrapper.ComposeMainPageViewModel(this);
         dataContext.OnPropertyChanged().Subscribe(_dataContextPropertyChangedEventHandler);
 
         FragmentView view = (FragmentView) getSupportFragmentManager().findFragmentById(R.id.main_page);
-        view.DataContext(dataContext);
+        if (view != null) {
+            view.DataContext(dataContext);
+        }
+
+        CheckNotificationPermission();
+    }
+
+    private void CheckNotificationPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+            {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE)
+        {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                // Permission granted
+            }
+        }
     }
 
     @Override
@@ -70,20 +110,23 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
-        switch (item.getItemId())
+        int id = item.getItemId();
+
+        if (id == R.id.action_viewLog)
         {
-            case R.id.action_viewLog:
-                ViewLog();
-                break;
-            case R.id.action_exportLog:
-                ExportLog();
-                break;
-            case R.id.action_settings:
-                ShowSettings();
-                break;
-            case R.id.action_about:
-                ShowAbout();
-                break;
+            ViewLog();
+        }
+        else if (id == R.id.action_exportLog)
+        {
+            ExportLog();
+        }
+        else if (id == R.id.action_settings)
+        {
+            ShowSettings();
+        }
+        else if (id == R.id.action_about)
+        {
+            ShowAbout();
         }
 
         return super.onOptionsItemSelected(item);

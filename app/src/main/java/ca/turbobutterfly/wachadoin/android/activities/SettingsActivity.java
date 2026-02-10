@@ -16,7 +16,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.provider.Settings;
-import android.support.v7.app.ActionBar;
+import androidx.appcompat.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
@@ -160,9 +160,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 }
             }
 
-            if (preference instanceof DatePreference)
+            if (preference instanceof DatePreference datePreference)
             {
-                DatePreference datePreference = (DatePreference)preference;
                 Date dateValue = datePreference.getDate();
                 String summary = DateUtils.LongDate(dateValue);
                 preference.setSummary(summary);

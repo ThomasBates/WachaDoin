@@ -11,7 +11,8 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v4.app.NotificationCompat;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
 import java.util.Date;
@@ -131,16 +132,25 @@ public class NotificationHelper
             return;
         }
 
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 _context,
                 0,
                 activityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                flags);
 
         //  Create Save Action intent
         Intent saveIntent = new Intent(_context, SaveReceiver.class);
+        int saveFlags = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            saveFlags = PendingIntent.FLAG_IMMUTABLE;
+        }
         PendingIntent savePendingIntent =
-                PendingIntent.getBroadcast(_context, 0, saveIntent, 0);
+                PendingIntent.getBroadcast(_context, 0, saveIntent, saveFlags);
 
 
 
@@ -231,11 +241,16 @@ public class NotificationHelper
     {
         Intent receiverIntent = new Intent(_context, AlarmReceiver.class);
 
+        int flags = PendingIntent.FLAG_ONE_SHOT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+
         return PendingIntent.getBroadcast(
                 _context,
                 0,
                 receiverIntent,
-                PendingIntent.FLAG_ONE_SHOT);
+                flags);
     }
 
 

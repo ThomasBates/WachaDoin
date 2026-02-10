@@ -3,7 +3,7 @@ package ca.turbobutterfly.wachadoin.core.viewmodels;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.Objects;
 
 import ca.turbobutterfly.core.data.IDataColumn;
 import ca.turbobutterfly.core.data.IDataRow;
@@ -25,14 +25,14 @@ public class ViewPageViewModel extends ViewModel
     //  Variables ----------------------------------------------------------------------------------
 
     //  Injected dependencies
-    private IDataProvider _dataProvider;
-    private IMainOptions _mainOptions;
+    private final IDataProvider _dataProvider;
+    private final IMainOptions _mainOptions;
 
     //  Property backers
     private String _dateRangeText;
     private IDataTable _logEntries;
 
-    private ICommand _prevCommand = new Command(new CommandListener()
+    private final ICommand _prevCommand = new Command(new CommandListener()
     {
         @Override
         public boolean CanExecute(Object parameters)
@@ -47,7 +47,7 @@ public class ViewPageViewModel extends ViewModel
         }
     });
 
-    private ICommand _nextCommand = new Command(new CommandListener()
+    private final ICommand _nextCommand = new Command(new CommandListener()
     {
         @Override
         public boolean CanExecute(Object parameters)
@@ -62,7 +62,7 @@ public class ViewPageViewModel extends ViewModel
         }
     });
 
-    private ICommand _editCellCommand = new Command(new CommandListener()
+    private final ICommand _editCellCommand = new Command(new CommandListener()
     {
         @Override
         public void Execute(Object parameter)
@@ -77,13 +77,13 @@ public class ViewPageViewModel extends ViewModel
     private Date _minRangeStart;
     private Date _maxRangeEnd;
 
-    private Boolean _use_reporting_period;
-    private Integer _reporting_period;
+    private final Boolean _use_reporting_period;
+    private final Integer _reporting_period;
     private Date _reporting_period_start;
-    private Integer _days_per_page;
-    private Boolean _group_by_date;
-    private String _logOrder;
-    private Integer _roundTime;
+    private final Integer _days_per_page;
+    private final Boolean _group_by_date;
+    private final String _logOrder;
+    private final Integer _roundTime;
 
     private IDataRow _dataRow;
     private IDataColumn _dataColumn;
@@ -255,7 +255,7 @@ public class ViewPageViewModel extends ViewModel
 
         Object oldValue = EditValue();
 
-        if ((oldValue == null) ? (editValue == null) : oldValue.equals(editValue))
+        if (Objects.equals(oldValue, editValue))
         {
             return;
         }
@@ -448,6 +448,7 @@ public class ViewPageViewModel extends ViewModel
         }
 
         _insertingRow = false;
+        String displayTime;
 
         switch (columnName)
         {
@@ -458,7 +459,7 @@ public class ViewPageViewModel extends ViewModel
                 break;
 
             case "DisplayStartTime":
-                String displayTime = (String)_dataRow.Value(columnName);
+                displayTime = (String)_dataRow.Value(columnName);
                 if (!TextUtils.equals(displayTime, "00:00"))
                 {
                     _dataColumn = _dataRow.DataTable().Column("StartTime");

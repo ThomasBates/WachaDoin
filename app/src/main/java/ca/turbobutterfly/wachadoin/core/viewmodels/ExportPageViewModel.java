@@ -3,7 +3,6 @@ package ca.turbobutterfly.wachadoin.core.viewmodels;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import ca.turbobutterfly.core.mvvm.Command;
 import ca.turbobutterfly.core.mvvm.CommandListener;
@@ -38,7 +37,7 @@ public class ExportPageViewModel extends ViewModel
     private Date _endTime;
     private String _endDateText;
 
-    private ICommand _exportCommand = new Command(new CommandListener()
+    private final ICommand _exportCommand = new Command(new CommandListener()
     {
         @Override
         public void Execute(Object parameters)
@@ -48,10 +47,10 @@ public class ExportPageViewModel extends ViewModel
     });
 
     //  Internal
-    private Boolean _use_reporting_period;
-    private Integer _reporting_period;
+    private final Boolean _use_reporting_period;
+    private final Integer _reporting_period;
     private Date _reporting_period_start;
-    private Integer _days_per_page;
+    private final Integer _days_per_page;
     private boolean _groupByDate;
     private String _logOrder;
     private int _roundTime;

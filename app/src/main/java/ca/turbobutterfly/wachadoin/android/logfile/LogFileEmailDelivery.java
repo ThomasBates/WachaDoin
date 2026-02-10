@@ -3,7 +3,7 @@ package ca.turbobutterfly.wachadoin.android.logfile;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -98,4 +98,4 @@ public class LogFileEmailDelivery implements ILogFileDelivery
     }
 }
 
-//  https://stackoverflow.com/questions/9974987/how-to-send-an-email-with-a-file-attachment-in-android?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+//  https://stackoverflow.com/questions/9974987/how-to-send-an-email-with-a-file-attachment-in-android?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa&utm_campaign=google_rich_qa

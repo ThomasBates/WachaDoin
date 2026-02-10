@@ -2,6 +2,7 @@ package ca.turbobutterfly.wachadoin.core.viewmodels;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import ca.turbobutterfly.android.utils.RunnableTimer;
 
@@ -38,7 +39,7 @@ public class MainPageViewModel extends ViewModel
     private String _logText;
     private String[] _recentLogText;
     
-    private ICommand _saveCommand = new Command(new CommandListener()
+    private final ICommand _saveCommand = new Command(new CommandListener()
     {
         @Override
         public void Execute(Object parameters)
@@ -46,7 +47,7 @@ public class MainPageViewModel extends ViewModel
             DoSave();
         }
     });
-    private ICommand _pauseCommand = new Command(new CommandListener()
+    private final ICommand _pauseCommand = new Command(new CommandListener()
     {
         @Override
         public void Execute(Object parameters)
@@ -54,7 +55,7 @@ public class MainPageViewModel extends ViewModel
             DoPause();
         }
     });
-    private ICommand _resumeCommand = new Command(new CommandListener()
+    private final ICommand _resumeCommand = new Command(new CommandListener()
     {
         @Override
         public void Execute(Object parameters)
@@ -63,8 +64,8 @@ public class MainPageViewModel extends ViewModel
         }
     });
 
-    private ITimer _timer;
-    private IEventHandler _timerTickEventHandler = new EventHandler()
+    private final ITimer _timer;
+    private final IEventHandler _timerTickEventHandler = new EventHandler()
     {
         @Override
         public void HandleEvent(Object sender, IEventArgs eventArgs)
@@ -82,7 +83,7 @@ public class MainPageViewModel extends ViewModel
                         + _mainOptions.Notification().snooze().Value())
             {
                 formattedInstruction = formattedInstruction
-                        + String.format(_sinceFormat, DateUtils.ShortTime(_startTime));;
+                        + String.format(_sinceFormat, DateUtils.ShortTime(_startTime));
             }
             InstructionText(formattedInstruction);
         }
@@ -122,7 +123,7 @@ public class MainPageViewModel extends ViewModel
 
     private void TimeText(String timeText)
     {
-        if (_timeText == null ? timeText == null : _timeText.equals(timeText))
+        if (Objects.equals(_timeText, timeText))
         {
             return;
         }
@@ -137,7 +138,7 @@ public class MainPageViewModel extends ViewModel
 
     private void InstructionText(String instructionText)
     {
-        if (_instructionText == null ? instructionText == null : _instructionText.equals(instructionText))
+        if (Objects.equals(_instructionText, instructionText))
         {
             return;
         }
@@ -152,7 +153,7 @@ public class MainPageViewModel extends ViewModel
 
     public void LogText(String logText)
     {
-        if (_logText == null ? logText == null : _logText.equals(logText))
+        if (Objects.equals(_logText, logText))
         {
             return;
         }
